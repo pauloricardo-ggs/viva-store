@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/route_manager.dart';
-import 'package:viva_store/pages/login_page.dart';
 import 'package:viva_store/pages/my_home_page.dart';
 
 import 'firebase_options.dart';
@@ -30,7 +29,7 @@ class MyApp extends StatelessWidget {
       darkTheme: _darkColorTheme(context),
       theme: _lightColorTheme(context),
       themeMode: ThemeMode.system,
-      home: const LoginPage(),
+      home: const MyHomePage(),
     );
   }
 

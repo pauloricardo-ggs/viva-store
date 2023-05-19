@@ -754,7 +754,10 @@ class _PhotoImporteeerState extends State<PhotoImporteeer> {
   }
 
   Future<File?> _cropImage({required File imageFile}) async {
-    CroppedFile? croppedImage = await ImageCropper().cropImage(sourcePath: imageFile.path);
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+      sourcePath: imageFile.path,
+      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+    );
     if (croppedImage == null) return null;
     return File(croppedImage.path);
   }
@@ -768,38 +771,31 @@ class _PhotoImporteeerState extends State<PhotoImporteeer> {
       itemCount: _image.length + 1,
       options: CarouselOptions(
         enableInfiniteScroll: false,
-        enlargeCenterPage: true,
-        disableCenter: true,
         enlargeFactor: 0.2,
+        height: size,
       ),
       itemBuilder: (context, index, realIndex) {
         return _image.isEmpty || index >= _image.length
-            ? AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                  width: size,
-                  height: size,
-                  decoration: BoxDecoration(
-                    color: isDark ? secondary.withOpacity(0.2) : secondary.withOpacity(0.16),
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(CupertinoIcons.photo, size: 50),
-                    onPressed: _pickImage,
-                  ),
+            ? Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  color: isDark ? secondary.withOpacity(0.2) : secondary.withOpacity(0.16),
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                child: IconButton(
+                  icon: const Icon(CupertinoIcons.photo, size: 50),
+                  onPressed: _pickImage,
                 ),
               )
-            : AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                    width: size,
-                    height: size,
-                    decoration: BoxDecoration(
-                      color: isDark ? secondary.withOpacity(0.2) : secondary.withOpacity(0.16),
-                      borderRadius: BorderRadius.circular(15.0),
-                      image: DecorationImage(image: FileImage(_image[index]), fit: BoxFit.cover),
-                    )),
-              );
+            : Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  color: isDark ? secondary.withOpacity(0.2) : secondary.withOpacity(0.16),
+                  borderRadius: BorderRadius.circular(15.0),
+                  image: DecorationImage(image: FileImage(_image[index]), fit: BoxFit.contain),
+                ));
       },
     );
   }
