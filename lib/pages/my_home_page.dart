@@ -1,10 +1,9 @@
-import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:viva_store/components/blurred_container.dart';
 import 'package:viva_store/models/product.dart';
 import 'package:viva_store/pages/account_page.dart';
 import 'package:viva_store/pages/favorites_page.dart';
@@ -32,11 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Align(
             alignment: FractionalOffset.bottomCenter,
             child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: 8.0,
-                  sigmaY: 8.0,
-                ),
+              child: BlurredContainer(
                 child: BottomNavigationBar(
                   type: BottomNavigationBarType.fixed,
                   backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.7),

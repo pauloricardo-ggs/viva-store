@@ -1,5 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
@@ -9,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:viva_store/components/blurred_container.dart';
+import 'package:viva_store/components/page_view_indicators.dart';
 
 class CreateProductPage extends StatefulWidget {
   const CreateProductPage({super.key});
@@ -26,6 +26,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
   final List<String> weightMetrics = ["g", "kg"];
   final List<String> dimensionMetrics = ["mm", "cm", "m"];
 
+  final photoPickerController = CarouselController();
   final nameController = TextEditingController();
   final priceController = TextEditingController(text: "R\$ 0,00");
   final lenghtController = TextEditingController();
@@ -69,98 +70,103 @@ class _CreateProductPageState extends State<CreateProductPage> {
         title: const Text("Cadastrar Produto"),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(0),
-          child: Column(
-            children: [
-              const PhotoImporteeer(),
-              _NameField(
-                controller: nameController,
-                verify: () => setState(() => nameIsEmpty = nameController.text.isEmpty),
-                onTap: () => _changedFocus,
-                isEmpty: nameIsEmpty,
-              ),
-              const SizedBox(height: 20),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          children: [
+            const SizedBox(height: 20.0),
+            _PhotoPicker(controller: photoPickerController),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0, top: 5.0),
+              child: Column(
                 children: [
-                  _PriceField(
-                    controller: priceController,
+                  _NameField(
+                    controller: nameController,
+                    verify: () => setState(() => nameIsEmpty = nameController.text.isEmpty),
+                    onTap: () => _changedFocus,
+                    isEmpty: nameIsEmpty,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _PriceField(
+                        controller: priceController,
+                        onTap: () => _changedFocus,
+                      ),
+                      const SizedBox(width: 10),
+                      _DiscountField(
+                        controller: discountController,
+                        onTap: () => _changedFocus,
+                      ),
+                      const SizedBox(width: 10),
+                      _StockField(
+                        controller: stockController,
+                        verify: () => setState(() => stockIsEmpty = stockController.text.isEmpty),
+                        onTap: () => _changedFocus,
+                        isEmpty: stockIsEmpty,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _DimensionsField(
+                    lenghtController: lenghtController,
+                    widthController: widthController,
+                    heightController: heightController,
+                    verifyLenght: () => setState(() => lenghtIsEmpty = lenghtController.text.isEmpty),
+                    verifyWidth: () => setState(() => widthIsEmpty = widthController.text.isEmpty),
+                    verifyHeight: () => setState(() => heightIsEmpty = heightController.text.isEmpty),
+                    changeMetric: (newMetric) => setState(() => selectedDimensionMetric = newMetric),
+                    onTap: ({focused = "dimensionsDropdownTextField"}) => _changedFocus(focusedField: focused),
+                    isFocused: dimensionsDropdownTextFieldIsFocused,
+                    lenghtIsEmpty: lenghtIsEmpty,
+                    widthIsEmpty: widthIsEmpty,
+                    heightIsEmpty: heightIsEmpty,
+                    selectedMetric: selectedDimensionMetric,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: 135,
+                        child: _WeightDropDownTextField(
+                          text: "Peso",
+                          selectedMetric: selectedWeightMetric,
+                          controller: weightController,
+                          verify: () => setState(() => weightIsEmpty = weightController.text.isEmpty),
+                          onChanged: (newMetric) => setState(() => selectedWeightMetric = newMetric),
+                          onTap: ({focused = "weightDropdownTextField"}) => _changedFocus(focusedField: focused),
+                          isEmpty: weightIsEmpty,
+                          isFocused: weightDropdownTextFieldIsFocused,
+                          items: weightMetrics,
+                          selectorWidth: 67,
+                          maxLenght: 4,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _CategoryField(
+                          selectedCategory: selectedCategory,
+                          categories: categories,
+                          changeCategory: (newCategory) => setState(() => selectedCategory = newCategory),
+                          verify: () => setState(() => categoryIsEmpty = selectedCategory == null),
+                          onTap: () => _changedFocus,
+                          isEmpty: categoryIsEmpty,
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _DescriptionField(
+                    controller: descriptionController,
                     onTap: () => _changedFocus,
                   ),
-                  const SizedBox(width: 10),
-                  _DiscountField(
-                    controller: discountController,
-                    onTap: () => _changedFocus,
-                  ),
-                  const SizedBox(width: 10),
-                  _StockField(
-                    controller: stockController,
-                    verify: () => setState(() => stockIsEmpty = stockController.text.isEmpty),
-                    onTap: () => _changedFocus,
-                    isEmpty: stockIsEmpty,
-                  ),
+                  ElevatedButton(onPressed: () => _create(), child: const Text("Enviar")),
+                  const SizedBox(height: 20),
                 ],
               ),
-              const SizedBox(height: 20),
-              _DimensionsField(
-                lenghtController: lenghtController,
-                widthController: widthController,
-                heightController: heightController,
-                verifyLenght: () => setState(() => lenghtIsEmpty = lenghtController.text.isEmpty),
-                verifyWidth: () => setState(() => widthIsEmpty = widthController.text.isEmpty),
-                verifyHeight: () => setState(() => heightIsEmpty = heightController.text.isEmpty),
-                changeMetric: (newMetric) => setState(() => selectedDimensionMetric = newMetric),
-                onTap: ({focused = "dimensionsDropdownTextField"}) => _changedFocus(focusedField: focused),
-                isFocused: dimensionsDropdownTextFieldIsFocused,
-                lenghtIsEmpty: lenghtIsEmpty,
-                widthIsEmpty: widthIsEmpty,
-                heightIsEmpty: heightIsEmpty,
-                selectedMetric: selectedDimensionMetric,
-              ),
-              const SizedBox(height: 20),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: 135,
-                    child: _WeightDropDownTextField(
-                      text: "Peso",
-                      selectedMetric: selectedWeightMetric,
-                      controller: weightController,
-                      verify: () => setState(() => weightIsEmpty = weightController.text.isEmpty),
-                      onChanged: (newMetric) => setState(() => selectedWeightMetric = newMetric),
-                      onTap: ({focused = "weightDropdownTextField"}) => _changedFocus(focusedField: focused),
-                      isEmpty: weightIsEmpty,
-                      isFocused: weightDropdownTextFieldIsFocused,
-                      items: weightMetrics,
-                      selectorWidth: 67,
-                      maxLenght: 4,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _CategoryField(
-                      selectedCategory: selectedCategory,
-                      categories: categories,
-                      changeCategory: (newCategory) => setState(() => selectedCategory = newCategory),
-                      verify: () => setState(() => categoryIsEmpty = selectedCategory == null),
-                      onTap: () => _changedFocus,
-                      isEmpty: categoryIsEmpty,
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 20),
-              _DescriptionField(
-                controller: descriptionController,
-                onTap: () => _changedFocus,
-              ),
-              ElevatedButton(onPressed: () => _create(), child: const Text("Enviar")),
-              const SizedBox(height: 20),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -726,35 +732,93 @@ class _WeightDropDownTextField extends StatelessWidget {
   }
 }
 
-class PhotoImporteeer extends StatefulWidget {
-  const PhotoImporteeer({Key? key}) : super(key: key);
+class _PhotoPicker extends StatefulWidget {
+  const _PhotoPicker({Key? key, required this.controller}) : super(key: key);
+
+  final CarouselController controller;
 
   @override
-  State<PhotoImporteeer> createState() => _PhotoImporteeerState();
+  State<_PhotoPicker> createState() => _PhotoPickerState();
 }
 
-class _PhotoImporteeerState extends State<PhotoImporteeer> {
-  final List<File> _image = [];
+class _PhotoPickerState extends State<_PhotoPicker> {
+  var _frontImage = 0;
+  var _tapped = false;
+  final List<File> _images = [];
 
-  Future _pickImage() async {
+  @override
+  Widget build(BuildContext context) {
+    const size = 250.0;
+    var isDark = Theme.of(context).brightness == Brightness.dark;
+    var secondary = Theme.of(context).colorScheme.secondary;
+    var itemsCount = _images.length + (_images.length < 5 ? 1 : 0);
+
+    return Column(
+      children: [
+        CarouselSlider.builder(
+          carouselController: widget.controller,
+          itemCount: itemsCount,
+          options: CarouselOptions(
+            enableInfiniteScroll: false,
+            enlargeCenterPage: true,
+            viewportFraction: 0.7,
+            height: 250,
+            onPageChanged: (index, reason) => setState(() => _frontImage = index),
+          ),
+          itemBuilder: (context, index, realIndex) {
+            if (_images.isEmpty || index == _images.length) {
+              if (_images.length < 5) {
+                return _addPhotoButton(size, isDark, secondary);
+              } else {
+                return const SizedBox();
+              }
+            } else {
+              return Stack(
+                children: [
+                  _photo(index, isDark, secondary),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: _tapped
+                        ? _blurriedPhotoMenu(isDark, index)
+                        : const SizedBox(
+                            key: Key('2'),
+                          ),
+                  ),
+                ],
+              );
+            }
+          },
+        ),
+        PageViewIndicators(numberOfPages: itemsCount, selectedPage: _frontImage)
+      ],
+    );
+  }
+
+  Future _pickImage({required ImageSource source}) async {
+    var picker = ImagePicker();
     try {
-      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (image == null) return;
-      File temporaryImage = File(image.path);
-      File? croppedImage = await _cropImage(imageFile: temporaryImage);
-
-      if (croppedImage != null) {
-        setState(() {
-          _image.add(croppedImage);
-        });
+      if (source == ImageSource.camera) {
+        final image = await picker.pickImage(source: source);
+        var croppedImage = await _cropImage(File(image!.path));
+        if (croppedImage != null) setState(() => _images.add(croppedImage));
+      } else {
+        final images = await picker.pickMultiImage();
+        if (images.length <= 5 - _images.length) {
+          for (var i = 0; i < images.length; i++) {
+            var croppedImage = await _cropImage(File(images[i].path));
+            if (croppedImage != null) setState(() => _images.add(croppedImage));
+          }
+        } else {
+          if (context.mounted) showCupertinoDialog(context: context, builder: _numberOfPhotosExcededDialog);
+        }
       }
     } on Exception catch (e) {
       debugPrint('Failed to pick image: $e');
     }
   }
 
-  Future<File?> _cropImage({required File imageFile}) async {
-    CroppedFile? croppedImage = await ImageCropper().cropImage(
+  Future<File?> _cropImage(File imageFile) async {
+    var croppedImage = await ImageCropper().cropImage(
       sourcePath: imageFile.path,
       aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
     );
@@ -762,41 +826,159 @@ class _PhotoImporteeerState extends State<PhotoImporteeer> {
     return File(croppedImage.path);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    const double size = 250.0;
-    bool isDark = Theme.of(context).brightness == Brightness.dark;
-    Color secondary = Theme.of(context).colorScheme.secondary;
-    return CarouselSlider.builder(
-      itemCount: _image.length + 1,
-      options: CarouselOptions(
-        enableInfiniteScroll: false,
-        enlargeFactor: 0.2,
-        height: size,
+  Widget _photo(int index, bool isDark, Color secondary) {
+    return GestureDetector(
+      onTap: () => _frontImage == index ? setState(() => _tapped = true) : null,
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDark ? secondary.withOpacity(0.2) : secondary.withOpacity(0.16),
+          borderRadius: BorderRadius.circular(15.0),
+          image: DecorationImage(image: FileImage(_images[index]), fit: BoxFit.cover),
+        ),
       ),
-      itemBuilder: (context, index, realIndex) {
-        return _image.isEmpty || index >= _image.length
-            ? Container(
-                width: size,
-                height: size,
-                decoration: BoxDecoration(
-                  color: isDark ? secondary.withOpacity(0.2) : secondary.withOpacity(0.16),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: IconButton(
-                  icon: const Icon(CupertinoIcons.photo, size: 50),
-                  onPressed: _pickImage,
-                ),
-              )
-            : Container(
-                width: size,
-                height: size,
-                decoration: BoxDecoration(
-                  color: isDark ? secondary.withOpacity(0.2) : secondary.withOpacity(0.16),
-                  borderRadius: BorderRadius.circular(15.0),
-                  image: DecorationImage(image: FileImage(_image[index]), fit: BoxFit.contain),
-                ));
-      },
+    );
+  }
+
+  Widget _addPhotoButton(double size, bool isDark, Color secondary) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: isDark ? secondary.withOpacity(0.2) : secondary.withOpacity(0.16),
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      child: IconButton(
+        icon: const Icon(CupertinoIcons.photo, size: 50),
+        onPressed: () {
+          setState(() => _tapped = false);
+          showCupertinoModalPopup(context: context, builder: _selectSourceActionSheet);
+        },
+      ),
+    );
+  }
+
+  Widget _numberOfPhotosExcededDialog(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: const Text("Limite excedido"),
+      content: const Text("Limite máximo de 5 fotos"),
+      actions: [
+        CupertinoDialogAction(
+          isDefaultAction: true,
+          onPressed: () {
+            Navigator.pop(context);
+            _pickImage(source: ImageSource.gallery);
+          },
+          child: const Text("Ok"),
+        )
+      ],
+    );
+  }
+
+  Widget _selectSourceActionSheet(BuildContext context) {
+    return CupertinoActionSheet(
+      title: const Text("Adicionar foto"),
+      message: const Text("De onde gostaria de adicionar a foto?"),
+      actions: [
+        CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.pop(context);
+            _pickImage(source: ImageSource.camera);
+          },
+          child: const Text("Câmera"),
+        ),
+        CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.pop(context);
+            _pickImage(source: ImageSource.gallery);
+          },
+          child: const Text("Galeria"),
+        ),
+      ],
+      cancelButton: CupertinoActionSheetAction(
+        child: const Text("Cancelar"),
+        onPressed: () => Navigator.pop(context),
+      ),
+    );
+  }
+
+  Widget _blurriedPhotoMenu(bool isDark, int index) {
+    return ClipRRect(
+      key: const Key('1'),
+      borderRadius: BorderRadius.circular(15.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: (isDark ? Colors.black : Colors.white).withOpacity(0.5),
+        ),
+        child: BlurredContainer(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _menuTextButton(
+                text: "Remover",
+                isDark: isDark,
+                onPressed: () => index == _frontImage ? setState(() => _images.removeAt(index)) : null,
+              ),
+              _divider(isDark),
+              _menuTextButton(
+                text: "Mover para direita",
+                isDark: isDark,
+                onPressed: index != _images.length - 1 && index == _frontImage
+                    ? () {
+                        setState(() {
+                          var image = _images.elementAt(index);
+                          _images.removeAt(index);
+                          _images.insert(index + 1, image);
+                          widget.controller.jumpToPage(index + 1);
+                        });
+                      }
+                    : null,
+              ),
+              _divider(isDark),
+              _menuTextButton(
+                text: "Mover para esquerda",
+                isDark: isDark,
+                onPressed: index != 0 && index == _frontImage
+                    ? () {
+                        setState(() {
+                          var image = _images.elementAt(index);
+                          _images.removeAt(index);
+                          _images.insert(index - 1, image);
+                          widget.controller.jumpToPage(index - 1);
+                        });
+                      }
+                    : null,
+              ),
+              _divider(isDark),
+              _menuTextButton(
+                text: "Ok",
+                isDark: isDark,
+                onPressed: () => index == _frontImage ? setState(() => _tapped = false) : null,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _divider(bool isDark) {
+    return Divider(
+      color: (isDark ? Colors.white : Colors.black).withOpacity(0.2),
+      thickness: 1,
+      height: 0,
+    );
+  }
+
+  Widget _menuTextButton({required String text, required bool isDark, VoidCallback? onPressed}) {
+    return Expanded(
+      child: TextButton(
+        onPressed: onPressed,
+        child: Text(
+          text,
+          style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 17),
+        ),
+      ),
     );
   }
 }

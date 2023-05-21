@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:viva_store/components/page_view_indicators.dart';
 import 'package:viva_store/pages/product/create_product_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -96,7 +97,6 @@ class _HomePageState extends State<HomePage> {
   ];
 
   int currentBanner = 0;
-  final int currentPage = 0;
   final searchController = TextEditingController();
 
   void onPageChanged(int index) {
@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> {
             _CategoriesList(categorias: _categories),
             const SizedBox(height: 10),
             _BannerPageView(ofertas: _offers, onPageChanged: onPageChanged),
-            _BannerPageIndicators(numberOfPages: _offers.length, selectedPage: currentBanner),
+            PageViewIndicators(numberOfPages: _offers.length, selectedPage: currentBanner),
             _ProductsOnSale(products: _products),
             const SizedBox(height: 100),
           ],
@@ -415,64 +415,6 @@ class _BannerPageView extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _BannerPageIndicators extends StatelessWidget {
-  const _BannerPageIndicators({
-    required this.numberOfPages,
-    required this.selectedPage,
-  });
-
-  final int numberOfPages;
-  final int selectedPage;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 30,
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        scrollDirection: Axis.horizontal,
-        itemCount: numberOfPages,
-        itemBuilder: (context, index) => _indicator(
-          isActive: selectedPage == index,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      ),
-    );
-  }
-
-  Widget _indicator({required bool isActive, required Color color}) {
-    return SizedBox(
-      height: 6,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        margin: const EdgeInsets.symmetric(horizontal: 4.0),
-        height: isActive ? 6 : 5.0,
-        width: isActive ? 7 : 5.0,
-        decoration: BoxDecoration(
-          boxShadow: [
-            isActive
-                ? BoxShadow(
-                    color: const Color(0XFF2FB7B2).withOpacity(0.72),
-                    blurRadius: 4.0,
-                    spreadRadius: 1.0,
-                    offset: const Offset(
-                      0.0,
-                      0.0,
-                    ),
-                  )
-                : const BoxShadow(
-                    color: Colors.transparent,
-                  )
-          ],
-          shape: BoxShape.circle,
-          color: isActive ? color : const Color.fromARGB(255, 202, 202, 202),
         ),
       ),
     );
