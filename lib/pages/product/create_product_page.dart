@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:viva_store/components/blurred_container.dart';
@@ -18,15 +18,15 @@ class CreateProductPage extends StatefulWidget {
 }
 
 class _CreateProductPageState extends State<CreateProductPage> {
-  late dynamic selectedCategory;
+  late String selectedCategory;
   late String selectedDimensionMetric;
   late String selectedWeightMetric;
 
   late List<String> categories;
+  final List<File> _images = [];
   final List<String> weightMetrics = ["g", "kg"];
   final List<String> dimensionMetrics = ["mm", "cm", "m"];
 
-  final photoPickerController = CarouselController();
   final nameController = TextEditingController();
   final priceController = TextEditingController(text: "R\$ 0,00");
   final lenghtController = TextEditingController();
@@ -73,7 +73,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
         child: Column(
           children: [
             const SizedBox(height: 20.0),
-            _PhotoPicker(controller: photoPickerController),
+            _PhotoPicker(
+              images: _images,
+            ),
             Padding(
               padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 20.0, top: 5.0),
               child: Column(
@@ -149,7 +151,6 @@ class _CreateProductPageState extends State<CreateProductPage> {
                           selectedCategory: selectedCategory,
                           categories: categories,
                           changeCategory: (newCategory) => setState(() => selectedCategory = newCategory),
-                          verify: () => setState(() => categoryIsEmpty = selectedCategory == null),
                           onTap: () => _changedFocus,
                           isEmpty: categoryIsEmpty,
                         ),
@@ -161,7 +162,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
                     controller: descriptionController,
                     onTap: () => _changedFocus,
                   ),
-                  ElevatedButton(onPressed: () => _create(), child: const Text("Enviar")),
+                  ElevatedButton(onPressed: () => _createProduct(), child: const Text("Enviar")),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -170,28 +171,6 @@ class _CreateProductPageState extends State<CreateProductPage> {
         ),
       ),
     );
-  }
-
-  void _create() {
-    setState(() {
-      nameIsEmpty = nameController.text.isEmpty;
-      stockIsEmpty = stockController.text.isEmpty;
-      weightIsEmpty = weightController.text.isEmpty;
-      lenghtIsEmpty = lenghtController.text.isEmpty;
-      widthIsEmpty = widthController.text.isEmpty;
-      heightIsEmpty = heightController.text.isEmpty;
-    });
-
-    if (!(nameIsEmpty || lenghtIsEmpty || widthIsEmpty || heightIsEmpty || weightIsEmpty || stockIsEmpty)) {
-      debugPrint(nameController.value.text);
-      debugPrint(priceController.value.text.removeAllWhitespace);
-      debugPrint(discountController.value.text);
-      debugPrint(stockController.value.text);
-      debugPrint("${lenghtController.value.text}x${widthController.value.text}x${heightController.value.text}$selectedDimensionMetric");
-      debugPrint("${weightController.value.text} $selectedWeightMetric");
-      debugPrint(selectedCategory);
-      debugPrint(descriptionController.value.text);
-    }
   }
 
   void _changedFocus({String? focusedField}) {
@@ -203,6 +182,77 @@ class _CreateProductPageState extends State<CreateProductPage> {
 
   List<String> _getCategories() {
     return ["Vestuário", "Beleza", "Decoração", "Cama, Mesa e Banho"];
+  }
+
+  Future _createProduct() async {
+    if (!_validPhotos()) {
+      showCupertinoModalPopup(context: context, builder: _noPhotosAddedDialog);
+      return;
+    }
+    if (!_validFields()) {
+      return;
+    }
+    final docProduct = FirebaseFirestore.instance.collection('produtos').doc();
+    final json = {
+      'nome': nameController.value.text,
+      'preco': priceController.value.text,
+      'desconto': discountController.value.text,
+      'estoque': stockController.value.text,
+      'dimensoes': "${lenghtController.value.text}x${widthController.value.text}x${widthController.value.text}$selectedDimensionMetric",
+      'peso': "${weightController.value.text}$selectedWeightMetric",
+      'categoria': selectedCategory,
+      'descricao': descriptionController.value.text,
+    };
+    await docProduct.set(json);
+    if (context.mounted) showCupertinoModalPopup(context: context, builder: _productCreatedDialog);
+  }
+
+  bool _validFields() {
+    setState(() {
+      nameIsEmpty = nameController.text.isEmpty;
+      stockIsEmpty = stockController.text.isEmpty;
+      weightIsEmpty = weightController.text.isEmpty;
+      lenghtIsEmpty = lenghtController.text.isEmpty;
+      widthIsEmpty = widthController.text.isEmpty;
+      heightIsEmpty = heightController.text.isEmpty;
+    });
+
+    return !(nameIsEmpty || lenghtIsEmpty || widthIsEmpty || heightIsEmpty || weightIsEmpty || stockIsEmpty);
+  }
+
+  bool _validPhotos() {
+    return _images.isNotEmpty;
+  }
+
+  Widget _noPhotosAddedDialog(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: const Text("Aviso"),
+      content: const Text("Adicione ao menos uma foto"),
+      actions: [
+        CupertinoDialogAction(
+          isDefaultAction: true,
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Ok"),
+        )
+      ],
+    );
+  }
+
+  Widget _productCreatedDialog(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: const Text("Sucesso"),
+      content: const Text("Produto cadastrado com sucesso"),
+      actions: [
+        CupertinoDialogAction(
+          isDefaultAction: true,
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
+          child: const Text("Ok"),
+        )
+      ],
+    );
   }
 }
 
@@ -370,7 +420,6 @@ class _CategoryField extends StatelessWidget {
   final String selectedCategory;
   final List<String> categories;
   final Function(String) changeCategory;
-  final Function verify;
   final Function onTap;
   final bool isEmpty;
 
@@ -379,7 +428,6 @@ class _CategoryField extends StatelessWidget {
     required this.selectedCategory,
     required this.categories,
     required this.changeCategory,
-    required this.verify,
     required this.onTap,
     required this.isEmpty,
   }) : super(key: key);
@@ -733,9 +781,9 @@ class _WeightDropDownTextField extends StatelessWidget {
 }
 
 class _PhotoPicker extends StatefulWidget {
-  const _PhotoPicker({Key? key, required this.controller}) : super(key: key);
+  const _PhotoPicker({Key? key, required this.images}) : super(key: key);
 
-  final CarouselController controller;
+  final List<File> images;
 
   @override
   State<_PhotoPicker> createState() => _PhotoPickerState();
@@ -744,19 +792,19 @@ class _PhotoPicker extends StatefulWidget {
 class _PhotoPickerState extends State<_PhotoPicker> {
   var _frontImage = 0;
   var _tapped = false;
-  final List<File> _images = [];
+  final CarouselController controller = CarouselController();
 
   @override
   Widget build(BuildContext context) {
     const size = 250.0;
     var isDark = Theme.of(context).brightness == Brightness.dark;
     var secondary = Theme.of(context).colorScheme.secondary;
-    var itemsCount = _images.length + (_images.length < 5 ? 1 : 0);
+    var itemsCount = widget.images.length + (widget.images.length < 5 ? 1 : 0);
 
     return Column(
       children: [
         CarouselSlider.builder(
-          carouselController: widget.controller,
+          carouselController: controller,
           itemCount: itemsCount,
           options: CarouselOptions(
             enableInfiniteScroll: false,
@@ -766,8 +814,8 @@ class _PhotoPickerState extends State<_PhotoPicker> {
             onPageChanged: (index, reason) => setState(() => _frontImage = index),
           ),
           itemBuilder: (context, index, realIndex) {
-            if (_images.isEmpty || index == _images.length) {
-              if (_images.length < 5) {
+            if (widget.images.isEmpty || index == widget.images.length) {
+              if (widget.images.length < 5) {
                 return _addPhotoButton(size, isDark, secondary);
               } else {
                 return const SizedBox();
@@ -800,13 +848,13 @@ class _PhotoPickerState extends State<_PhotoPicker> {
       if (source == ImageSource.camera) {
         final image = await picker.pickImage(source: source);
         var croppedImage = await _cropImage(File(image!.path));
-        if (croppedImage != null) setState(() => _images.add(croppedImage));
+        if (croppedImage != null) setState(() => widget.images.add(croppedImage));
       } else {
         final images = await picker.pickMultiImage();
-        if (images.length <= 5 - _images.length) {
+        if (images.length <= 5 - widget.images.length) {
           for (var i = 0; i < images.length; i++) {
             var croppedImage = await _cropImage(File(images[i].path));
-            if (croppedImage != null) setState(() => _images.add(croppedImage));
+            if (croppedImage != null) setState(() => widget.images.add(croppedImage));
           }
         } else {
           if (context.mounted) showCupertinoDialog(context: context, builder: _numberOfPhotosExcededDialog);
@@ -833,7 +881,7 @@ class _PhotoPickerState extends State<_PhotoPicker> {
         decoration: BoxDecoration(
           color: isDark ? secondary.withOpacity(0.2) : secondary.withOpacity(0.16),
           borderRadius: BorderRadius.circular(15.0),
-          image: DecorationImage(image: FileImage(_images[index]), fit: BoxFit.cover),
+          image: DecorationImage(image: FileImage(widget.images[index]), fit: BoxFit.cover),
         ),
       ),
     );
@@ -917,19 +965,19 @@ class _PhotoPickerState extends State<_PhotoPicker> {
               _menuTextButton(
                 text: "Remover",
                 isDark: isDark,
-                onPressed: () => index == _frontImage ? setState(() => _images.removeAt(index)) : null,
+                onPressed: () => index == _frontImage ? setState(() => widget.images.removeAt(index)) : null,
               ),
               _divider(isDark),
               _menuTextButton(
                 text: "Mover para direita",
                 isDark: isDark,
-                onPressed: index != _images.length - 1 && index == _frontImage
+                onPressed: index != widget.images.length - 1 && index == _frontImage
                     ? () {
                         setState(() {
-                          var image = _images.elementAt(index);
-                          _images.removeAt(index);
-                          _images.insert(index + 1, image);
-                          widget.controller.jumpToPage(index + 1);
+                          var image = widget.images.elementAt(index);
+                          widget.images.removeAt(index);
+                          widget.images.insert(index + 1, image);
+                          controller.jumpToPage(index + 1);
                         });
                       }
                     : null,
@@ -941,10 +989,10 @@ class _PhotoPickerState extends State<_PhotoPicker> {
                 onPressed: index != 0 && index == _frontImage
                     ? () {
                         setState(() {
-                          var image = _images.elementAt(index);
-                          _images.removeAt(index);
-                          _images.insert(index - 1, image);
-                          widget.controller.jumpToPage(index - 1);
+                          var image = widget.images.elementAt(index);
+                          widget.images.removeAt(index);
+                          widget.images.insert(index - 1, image);
+                          controller.jumpToPage(index - 1);
                         });
                       }
                     : null,
