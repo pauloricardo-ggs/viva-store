@@ -62,7 +62,6 @@ class _MinhaContaPageState extends State<MinhaContaPage> {
   Widget buidBotaoBase(BuildContext context, {required String texto, required IconData icone, required Function onPressed, Color? cor, bool bordaNoTopo = false}) {
     var theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
         color: theme.inputDecorationTheme.fillColor,
         border: Border(
@@ -70,20 +69,21 @@ class _MinhaContaPageState extends State<MinhaContaPage> {
           bottom: BorderSide(color: theme.colorScheme.onBackground.withOpacity(0.5), width: 0.4),
         ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Flexible(child: Icon(icone, color: cor ?? theme.colorScheme.onBackground)),
-          TextButton(
-            style: const ButtonStyle(alignment: Alignment.centerLeft),
-            onPressed: () => onPressed(),
-            child: Text(
-              texto,
-              style: TextStyle(color: cor ?? theme.colorScheme.onBackground, fontSize: 15),
-              textAlign: TextAlign.start,
-            ),
-          ),
-        ],
+      child: ElevatedButton(
+        onPressed: () => onPressed(),
+        style: const ButtonStyle(
+          backgroundColor: MaterialStatePropertyAll(Colors.transparent),
+          elevation: MaterialStatePropertyAll(0),
+          fixedSize: MaterialStatePropertyAll(Size(double.infinity, 48)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Flexible(child: Icon(icone, color: cor ?? theme.colorScheme.onBackground)),
+            const SizedBox(width: 5),
+            Text(texto, style: TextStyle(color: cor ?? theme.colorScheme.onBackground, fontSize: 15)),
+          ],
+        ),
       ),
     );
   }
