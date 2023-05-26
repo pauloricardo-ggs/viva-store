@@ -23,6 +23,7 @@ class _MinhaContaPageState extends State<MinhaContaPage> {
             buildBotaoPlaceHolder(context),
             const SizedBox(height: 10),
             buildBotaoSair(context),
+            const SizedBox(height: 100),
           ],
         ),
       ),
@@ -58,26 +59,27 @@ class _MinhaContaPageState extends State<MinhaContaPage> {
     );
   }
 
-  Widget buidBotaoBase(BuildContext context, {required String texto, required IconData icone, required Function onPressed, Color cor = Colors.black, bool bordaNoTopo = false}) {
+  Widget buidBotaoBase(BuildContext context, {required String texto, required IconData icone, required Function onPressed, Color? cor, bool bordaNoTopo = false}) {
+    var theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        color: theme.inputDecorationTheme.fillColor,
         border: Border(
-          top: bordaNoTopo ? const BorderSide(color: Colors.grey, width: 0.4) : BorderSide.none,
-          bottom: const BorderSide(color: Colors.grey, width: 0.4),
+          top: bordaNoTopo ? BorderSide(color: theme.colorScheme.onBackground.withOpacity(0.3), width: 0.4) : BorderSide.none,
+          bottom: BorderSide(color: theme.colorScheme.onBackground.withOpacity(0.5), width: 0.4),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: [
-          Flexible(child: Icon(icone, color: cor)),
+          Flexible(child: Icon(icone, color: cor ?? theme.colorScheme.onBackground)),
           TextButton(
             style: const ButtonStyle(alignment: Alignment.centerLeft),
             onPressed: () => onPressed(),
             child: Text(
               texto,
-              style: TextStyle(color: cor, fontSize: 15),
+              style: TextStyle(color: cor ?? theme.colorScheme.onBackground, fontSize: 15),
               textAlign: TextAlign.start,
             ),
           ),

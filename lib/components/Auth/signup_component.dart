@@ -38,6 +38,19 @@ class _SignupComponentState extends State<SignupComponent> {
   final _confirmacaoSenhaController = TextEditingController();
 
   @override
+  void dispose() {
+    _nomeCompletoController.dispose();
+    _cpfController.dispose();
+    _dataNascimentoController.dispose();
+    _telefoneController.dispose();
+    _emailController.dispose();
+    _senhaController.dispose();
+    _confirmacaoSenhaController.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),

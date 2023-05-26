@@ -43,6 +43,7 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.light,
             primary: primary,
             secondary: secondary,
+            onBackground: Colors.black,
           ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -84,6 +85,7 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.dark,
             primary: primary,
             secondary: secondary,
+            onBackground: Colors.white,
           ),
       appBarTheme: AppBarTheme(
         foregroundColor: Colors.white,

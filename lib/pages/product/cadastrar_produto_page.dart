@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -192,7 +193,19 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
     if (!_validFields()) {
       return;
     }
+
     final docProduct = FirebaseFirestore.instance.collection('produtos').doc();
+
+    try {
+      for (var index = 0; index < _images.length; index++) {
+        final diretorio = FirebaseStorage.instance.ref().child('imagens/produtos/${docProduct.id}/${docProduct.id}_${index + 1}');
+        await diretorio.putFile(_images[index]);
+        //referenciaImagem.getDownloadURL();
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+
     final json = {
       'nome': nameController.value.text,
       'preco': priceController.value.text,
