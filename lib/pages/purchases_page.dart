@@ -15,7 +15,7 @@ class _PurchasesPageState extends State<PurchasesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Minhas compras"),
+        title: const Text("Minhas Compras"),
       ),
     );
   }

@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:viva_store/components/Auth/login_component.dart';
 import 'package:viva_store/components/Auth/signup_component.dart';
-import 'package:viva_store/pages/account_page.dart';
+import 'package:viva_store/pages/minha_conta_page.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({Key? key}) : super(key: key);
@@ -20,7 +20,7 @@ class _AuthPageState extends State<AuthPage> {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) return const CircularProgressIndicator();
-        if (snapshot.hasData) return const AccountPage();
+        if (snapshot.hasData) return const MinhaContaPage();
         return entrar ? LoginComponent(aoClicarCadastrar: toggle) : SignupComponent(aoClicarEntrar: toggle);
       },
     );

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:viva_store/components/page_view_indicators.dart';
-import 'package:viva_store/pages/product/create_product_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -124,7 +123,7 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateProductPage())),
+              onPressed: () => {},
               icon: Icon(
                 CupertinoIcons.cart_fill,
                 color: colorScheme.secondary,

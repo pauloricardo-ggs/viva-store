@@ -10,14 +10,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:viva_store/components/blurred_container.dart';
 import 'package:viva_store/components/page_view_indicators.dart';
 
-class CreateProductPage extends StatefulWidget {
-  const CreateProductPage({super.key});
+class CadastrarProdutoPage extends StatefulWidget {
+  const CadastrarProdutoPage({super.key});
 
   @override
-  State<CreateProductPage> createState() => _CreateProductPageState();
+  State<CadastrarProdutoPage> createState() => _CadastrarProdutoPageState();
 }
 
-class _CreateProductPageState extends State<CreateProductPage> {
+class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
   late String selectedCategory;
   late String selectedDimensionMetric;
   late String selectedWeightMetric;
