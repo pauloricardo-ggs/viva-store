@@ -11,6 +11,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:viva_store/components/blurred_container.dart';
 import 'package:viva_store/components/page_view_indicators.dart';
+import 'package:viva_store/models/produto.dart';
 
 class CadastrarProdutoPage extends StatefulWidget {
   const CadastrarProdutoPage({super.key});
@@ -189,33 +190,38 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
       return;
     }
 
-    final docProduct = FirebaseFirestore.instance.collection('produtos').doc();
+    final produtoDoc = FirebaseFirestore.instance.collection('produtos').doc();
+    final List<String> imagensUrl = [];
 
     try {
       for (var index = 0; index < _imagens.length; index++) {
-        final diretorio = FirebaseStorage.instance.ref().child('imagens/produtos/${docProduct.id}/${docProduct.id}_${index + 1}');
+        final diretorio = FirebaseStorage.instance.ref().child('imagens/produtos/${produtoDoc.id}/${produtoDoc.id}_${index + 1}');
         await diretorio.putFile(_imagens[index]);
+        imagensUrl.add(await diretorio.getDownloadURL());
       }
     } catch (e) {
       setState(() => cadastrando = false);
       exibirMensagem(e.toString(), sucesso: false);
     }
 
-    final json = {
-      'nome': nomeController.value.text,
-      'preco': double.parse(precoController.value.text.replaceAll('R\$ ', '').replaceAll(',', '.')),
-      'porcentagemDesconto': int.parse(porcentagemDescontoController.value.text.replaceAll('%', '')),
-      'estoque': int.parse(estoqueController.value.text),
-      'comprimento': double.parse(comprimentoController.value.text.replaceAll(',', '.')),
-      'largura': double.parse(larguraController.value.text.replaceAll(',', '.')),
-      'altura': double.parse(alturaController.value.text.replaceAll(',', '.')),
-      'escalaDimensao': escalaDimensaoSelecionada,
-      'peso': double.parse(pesoController.value.text.replaceAll(',', '.')),
-      'escalaPeso': escalaPesoSelecionada,
-      'categoria': categoriaSelecionada,
-      'descricao': descricaoController.value.text,
-    };
-    await docProduct.set(json);
+    final json = Produto(
+            id: produtoDoc.id,
+            nome: nomeController.value.text,
+            preco: double.parse(precoController.value.text.replaceAll('R\$ ', '').replaceAll(',', '.')),
+            porcentagemDesconto: int.tryParse(porcentagemDescontoController.value.text.replaceAll('%', '')) ?? 0,
+            estoque: int.parse(estoqueController.value.text),
+            comprimento: double.parse(comprimentoController.value.text.replaceAll(',', '.')),
+            largura: double.parse(larguraController.value.text.replaceAll(',', '.')),
+            altura: double.parse(alturaController.value.text.replaceAll(',', '.')),
+            escalaDimensao: escalaDimensaoSelecionada,
+            peso: double.parse(pesoController.value.text.replaceAll(',', '.')),
+            escalaPeso: escalaPesoSelecionada,
+            categoria: categoriaSelecionada,
+            descricao: descricaoController.value.text,
+            imagensUrl: imagensUrl)
+        .toMap();
+
+    await produtoDoc.set(json);
 
     setState(() => cadastrando = false);
 

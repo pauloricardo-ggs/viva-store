@@ -7,14 +7,14 @@ import 'package:viva_store/pages/favorites_page.dart';
 import 'package:viva_store/pages/home_page.dart';
 import 'package:viva_store/pages/purchases_page.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class BarraNavegacao extends StatefulWidget {
+  const BarraNavegacao({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<BarraNavegacao> createState() => _BarraNavegacaoState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _BarraNavegacaoState extends State<BarraNavegacao> {
   int _currentPage = 0;
 
   @override
