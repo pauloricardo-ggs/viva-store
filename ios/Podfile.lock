@@ -735,6 +735,8 @@ PODS:
   - nanopb/encode (2.30909.0)
   - PromisesObjC (2.2.0)
   - TOCropViewController (2.6.1)
+  - validadores (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
@@ -743,6 +745,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - validadores (from `.symlinks/plugins/validadores/ios`)
 
 SPEC REPOS:
   trunk:
@@ -777,6 +780,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_cropper/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
+  validadores:
+    :path: ".symlinks/plugins/validadores/ios"
 
 SPEC CHECKSUMS:
   abseil: ebe5b5529fb05d93a8bdb7951607be08b7fa71bc
@@ -802,6 +807,7 @@ SPEC CHECKSUMS:
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   PromisesObjC: 09985d6d70fbe7878040aa746d78236e6946d2ef
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
+  validadores: 206300a4c79554790e2fc64e10917fe7db87dce1
 
 PODFILE CHECKSUM: 70d9d25280d0dd177a5f637cdb0f0b0b12c6a189
 

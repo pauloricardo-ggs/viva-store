@@ -49,20 +49,25 @@ class MyApp extends StatelessWidget {
         fillColor: secondary!.withOpacity(0.16),
         hintStyle: const TextStyle(color: Colors.black45),
         enabledBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15.0)),
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
           borderSide: BorderSide(color: Colors.transparent),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(15.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(8.0)),
           borderSide: BorderSide(color: primary),
         ),
         errorBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15.0)),
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
           borderSide: BorderSide(color: Colors.red),
         ),
         focusedErrorBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15.0)),
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
           borderSide: BorderSide(color: Color.fromARGB(78, 255, 0, 0)),
+        ),
+      ),
+      buttonTheme: const ButtonThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
         ),
       ),
     );
@@ -98,19 +103,19 @@ class MyApp extends StatelessWidget {
         filled: true,
         fillColor: secondary!.withOpacity(0.2),
         enabledBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15.0)),
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
           borderSide: BorderSide(color: Colors.transparent),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(15.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(8.0)),
           borderSide: BorderSide(color: primary!),
         ),
         errorBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15.0)),
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
           borderSide: BorderSide(color: Colors.red),
         ),
         focusedErrorBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15.0)),
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
           borderSide: BorderSide(color: Color.fromARGB(78, 255, 0, 0)),
         ),
       ),

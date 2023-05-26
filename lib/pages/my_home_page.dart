@@ -1,11 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:viva_store/components/blurred_container.dart';
-import 'package:viva_store/models/product.dart';
-import 'package:viva_store/pages/account_page.dart';
+import 'package:viva_store/pages/auth_page.dart';
 import 'package:viva_store/pages/favorites_page.dart';
 import 'package:viva_store/pages/home_page.dart';
 import 'package:viva_store/pages/purchases_page.dart';
@@ -18,18 +15,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Widget> pages = [const HomePage(), const FavoritesPage(), const PurchasesPage(), const AccountPage()];
   int _currentPage = 0;
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      const HomePage(),
+      const FavoritesPage(),
+      const PurchasesPage(),
+      const AuthPage(),
+    ];
     return Scaffold(
       body: Stack(
         children: [
           pages[_currentPage],
-          const SizedBox(height: 100),
           Align(
-            alignment: FractionalOffset.bottomCenter,
+            alignment: Alignment.bottomCenter,
             child: ClipRect(
               child: BlurredContainer(
                 child: BottomNavigationBar(
@@ -71,27 +72,5 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     );
-  }
-
-  Future createProduct() async {
-    var product = Product(
-      photo: "photo",
-      name: "produto x",
-      description: "esse é o produto x",
-      category: "vestimenta",
-      price: 99.99,
-      height: 500,
-      width: 20,
-      lenght: 20,
-      weight: 20,
-      stock: 20,
-      discountPercentage: 5,
-    );
-
-    var jsonProduct = product.toMap();
-
-    final docProduct = FirebaseFirestore.instance.collection('products').doc();
-
-    await docProduct.set(jsonProduct);
   }
 }
