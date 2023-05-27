@@ -7,8 +7,9 @@ class CarrinhoController extends GetxController {
   RxMap<dynamic, dynamic> get itens => _itens;
 
   Future carregarItens() async {
+    final itens = await _carrinhoRepository.obterItens();
     _itens.clear();
-    _itens.addAll(await _carrinhoRepository.obterItens());
+    _itens.addAll(itens);
   }
 
   Future adicionarItem(String produtoId) async {

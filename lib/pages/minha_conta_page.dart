@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:viva_store/controllers/auth_controller.dart';
 import 'package:viva_store/pages/product/cadastrar_produto_page.dart';
 
 class MinhaContaPage extends StatefulWidget {
@@ -11,6 +12,8 @@ class MinhaContaPage extends StatefulWidget {
 }
 
 class _MinhaContaPageState extends State<MinhaContaPage> {
+  final _authController = Get.put(AuthController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,15 +92,6 @@ class _MinhaContaPageState extends State<MinhaContaPage> {
   }
 
   void deslogar() async {
-    try {
-      await FirebaseAuth.instance.signOut();
-    } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.code),
-          backgroundColor: Colors.red.shade600,
-        ),
-      );
-    }
+    _authController.sair();
   }
 }

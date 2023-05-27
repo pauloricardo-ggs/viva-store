@@ -31,6 +31,14 @@ class AuthRepository {
     }
   }
 
+  Future sair() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+    } on FirebaseAuthException {
+      rethrow;
+    }
+  }
+
   User? obterUsuarioLogado() {
     return firebaseAuth.currentUser;
   }

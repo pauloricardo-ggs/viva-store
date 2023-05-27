@@ -9,6 +9,7 @@ import 'package:viva_store/components/HomePage/botao_banner.dart';
 import 'package:viva_store/components/HomePage/botao_categoria.dart';
 import 'package:viva_store/components/HomePage/botao_produto_oferta.dart';
 import 'package:viva_store/components/page_view_indicators.dart';
+import 'package:viva_store/controllers/auth_controller.dart';
 import 'package:viva_store/controllers/carrinho_controller.dart';
 import 'package:viva_store/models/produto.dart';
 import 'package:viva_store/pages/cart_products.dart';
@@ -38,6 +39,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final carrinhoController = Get.put(CarrinhoController());
+  final authController = Get.put(AuthController());
 
   final barraDePesquisaController = TextEditingController();
 
@@ -47,7 +49,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    carrinhoController.carregarItens();
+    if (authController.logado()) {
+      carrinhoController.carregarItens();
+    } else {
+      carrinhoController.itens.clear();
+    }
     super.initState();
   }
 
@@ -74,8 +80,8 @@ class _HomePageState extends State<HomePage> {
             child: IconButton(
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CartProducts())),
               icon: badges.Badge(
-                badgeStyle: const badges.BadgeStyle(badgeColor: Colors.black),
-                badgeContent: Obx(() => Text('${carrinhoController.itens.length}', style: const TextStyle(color: Colors.white))),
+                badgeStyle: badges.BadgeStyle(badgeColor: authController.logado() ? Colors.black : Colors.transparent),
+                badgeContent: Obx(() => Text('${carrinhoController.itens.length}', style: TextStyle(color: authController.logado() ? Colors.white : Colors.transparent))),
                 child: Icon(
                   CupertinoIcons.cart_fill,
                   color: colorScheme.secondary,

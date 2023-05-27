@@ -11,15 +11,19 @@ class AuthController extends GetxController {
   User? get usuario => _usuario;
 
   AuthController() {
-    //carregarItens();
-  }
-
-  Future logar({required String email, required String senha}) async {
-    await _authRepository.logar(email, senha);
     _atualizarUsuarioLogado();
   }
 
-  Future cadastrar({required String email, required String senha, required String nome, required String cpf, required String dataNascimento, required String telefone}) async {
+  Future<void> logar({required String email, required String senha}) async {
+    try {
+      await _authRepository.logar(email, senha);
+      _atualizarUsuarioLogado();
+    } on FirebaseAuthException catch (e) {
+      snackBar.erro(mensagem: e.code);
+    }
+  }
+
+  Future<void> cadastrar({required String email, required String senha, required String nome, required String cpf, required String dataNascimento, required String telefone}) async {
     try {
       var credential = await _authRepository.cadastrarUsuario(email, senha);
 
@@ -44,7 +48,20 @@ class AuthController extends GetxController {
     }
   }
 
+  Future<void> sair() async {
+    try {
+      await _authRepository.sair();
+      _atualizarUsuarioLogado();
+    } on FirebaseAuthException catch (e) {
+      snackBar.erro(mensagem: e.code);
+    }
+  }
+
   _atualizarUsuarioLogado() {
     _usuario = _authRepository.obterUsuarioLogado();
+  }
+
+  bool logado() {
+    return usuario != null;
   }
 }
