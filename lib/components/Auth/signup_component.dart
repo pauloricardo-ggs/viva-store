@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
@@ -7,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:validadores/Validador.dart';
+import 'package:viva_store/components/blurred_container.dart';
+import 'package:viva_store/controllers/auth_controller.dart';
 
 class SignupComponent extends StatefulWidget {
   const SignupComponent({
@@ -21,6 +21,8 @@ class SignupComponent extends StatefulWidget {
 }
 
 class _SignupComponentState extends State<SignupComponent> {
+  final _authController = Get.put(AuthController());
+
   final _formKey = GlobalKey<FormState>();
   final _senhaKey = GlobalKey<FlutterPwValidatorState>();
 
@@ -52,37 +54,49 @@ class _SignupComponentState extends State<SignupComponent> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: Form(
-        key: _formKey,
-        child: ListView(
-          children: [
-            const SizedBox(height: 20.0),
-            buildNomeCompleto(),
-            const SizedBox(height: 20.0),
-            Row(
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Form(
+            key: _formKey,
+            child: ListView(
               children: [
-                buildCpf(),
-                const SizedBox(width: 20.0),
-                buildDataNascimento(),
+                const SizedBox(height: 20.0),
+                buildNomeCompleto(),
+                const SizedBox(height: 20.0),
+                Row(
+                  children: [
+                    buildCpf(),
+                    const SizedBox(width: 20.0),
+                    buildDataNascimento(),
+                  ],
+                ),
+                const SizedBox(height: 20.0),
+                buildTelefone(),
+                const SizedBox(height: 20.0),
+                buildEmail(),
+                const SizedBox(height: 20.0),
+                buildSenha(),
+                const SizedBox(height: 20.0),
+                buildConfirmacaoSenha(),
+                const SizedBox(height: 20.0),
+                buildBotaoCadastrar(),
+                buildBotaoEntrar(),
+                const SizedBox(height: 100),
               ],
             ),
-            const SizedBox(height: 20.0),
-            buildTelefone(),
-            const SizedBox(height: 20.0),
-            buildEmail(),
-            const SizedBox(height: 20.0),
-            buildSenha(),
-            const SizedBox(height: 20.0),
-            buildConfirmacaoSenha(),
-            const SizedBox(height: 20.0),
-            buildBotaoCadastrar(),
-            buildBotaoEntrar(),
-            const SizedBox(height: 100),
-          ],
+          ),
         ),
-      ),
+        _carregando
+            ? const Stack(
+                children: [
+                  ModalBarrier(dismissible: false),
+                  BlurredContainer(blurriness: 4, child: Center(child: SizedBox(width: 60, height: 60, child: CircularProgressIndicator()))),
+                ],
+              )
+            : const SizedBox(),
+      ],
     );
   }
 
@@ -226,31 +240,20 @@ class _SignupComponentState extends State<SignupComponent> {
   }
 
   Widget buildBotaoCadastrar() {
-    return _carregando
-        ? Container(
-            width: 100,
-            height: 50,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8.0)),
-            child: const Center(
-              child: SizedBox(
-                width: 30,
-                height: 30,
-                child: Center(child: CircularProgressIndicator(strokeWidth: 4)),
-              ),
-            ),
-          )
-        : ElevatedButton(
-            style: const ButtonStyle(
-              fixedSize: MaterialStatePropertyAll(Size(double.infinity, 59)),
-            ),
-            onPressed: () {
+    return ElevatedButton(
+      style: const ButtonStyle(
+        fixedSize: MaterialStatePropertyAll(Size(double.infinity, 59)),
+      ),
+      onPressed: _carregando
+          ? null
+          : () {
               final valido = _formKey.currentState!.validate();
               if (valido) {
                 cadastrar();
               }
             },
-            child: const Text('Cadastrar', style: TextStyle(fontSize: 20)),
-          );
+      child: const Text('Cadastrar', style: TextStyle(fontSize: 20)),
+    );
   }
 
   Widget buildBotaoEntrar() {
@@ -276,37 +279,15 @@ class _SignupComponentState extends State<SignupComponent> {
   }
 
   Future cadastrar() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _carregando = true);
-    try {
-      var credenciais = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: _emailController.text, password: _senhaController.text);
-      scaffoldMessenger('Usuário cadastrado com sucesso!', cor: Colors.green);
-      final docProduct = FirebaseFirestore.instance.collection('perfilUsuarios').doc(credenciais.user!.uid);
-      final json = {
-        'nomeCompleto': _nomeCompletoController.value.text,
-        'cpf': _cpfController.value.text,
-        'dataNascimento': _dataNascimentoController.value.text,
-        'telefone': _telefoneController.value.text,
-      };
-      await docProduct.set(json);
-    } on FirebaseAuthException catch (e) {
-      var mensagemErro = '';
-      setState(() => _carregando = false);
-      if (e.code == 'email-already-in-use') {
-        mensagemErro = 'Já existe uma conta com o email informado';
-      } else {
-        mensagemErro = e.code;
-      }
-
-      scaffoldMessenger(mensagemErro, cor: Colors.red.shade600);
-    }
-  }
-
-  void scaffoldMessenger(String mensagem, {required Color cor}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: cor,
-      ),
-    );
+    await _authController.cadastrar(
+        email: _emailController.text,
+        senha: _senhaController.text,
+        nome: _nomeCompletoController.text,
+        cpf: _cpfController.text,
+        dataNascimento: _dataNascimentoController.text,
+        telefone: _telefoneController.text);
+    if (mounted) setState(() => _carregando = false);
   }
 }

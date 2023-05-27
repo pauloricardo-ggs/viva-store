@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:viva_store/controllers/auth_controller.dart';
 
 class LoginComponent extends StatefulWidget {
   const LoginComponent({
@@ -16,11 +17,13 @@ class LoginComponent extends StatefulWidget {
 }
 
 class _LoginComponentState extends State<LoginComponent> {
-  bool _carregando = false;
-  bool _erro = false;
+  final _authController = Get.put(AuthController());
 
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
+
+  bool _carregando = false;
+  bool _erro = false;
 
   @override
   void dispose() {
@@ -63,8 +66,7 @@ class _LoginComponentState extends State<LoginComponent> {
       _erro = false;
     });
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(email: _emailController.text, password: _senhaController.text);
-      debugPrint('logado');
+      await _authController.logar(email: _emailController.text, senha: _senhaController.text);
     } catch (e) {
       setState(() {
         _carregando = false;

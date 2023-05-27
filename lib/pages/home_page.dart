@@ -37,12 +37,19 @@ class _HomePageState extends State<HomePage> {
     "images/home_page/banners/oferta_banheiro.jpg",
   ];
 
-  final barraDePesquisaController = TextEditingController();
   final carrinhoController = Get.put(CarrinhoController());
+
+  final barraDePesquisaController = TextEditingController();
 
   int bannerAtual = 0;
   int quantidadeOfertasExibindo = 5;
   List<Produto> produtos = [];
+
+  @override
+  void initState() {
+    carrinhoController.carregarItens();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

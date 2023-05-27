@@ -1,20 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:viva_store/controllers/auth_controller.dart';
 import 'package:viva_store/models/carrinho.dart';
 import 'package:viva_store/models/item_carrinho.dart';
 
 class CarrinhoRepository {
-  final firebaseAuth = FirebaseAuth.instance;
+  final authController = Get.put(AuthController());
   final firebaseFirestore = FirebaseFirestore.instance;
 
   final collection = 'carrinhos';
 
   Future obterItens() async {
-    if (firebaseAuth.currentUser == null) {
-      /*logar*/
+    if (authController.usuario == null) {
+      return;
     }
-    final usuarioId = firebaseAuth.currentUser!.uid;
+    final usuarioId = authController.usuario!.uid;
 
     final carrinhoSnapshot = await firebaseFirestore.collection(collection).doc(usuarioId).get();
 
@@ -34,7 +34,7 @@ class CarrinhoRepository {
   }
 
   Future atualizar(RxMap<dynamic, dynamic> itens) async {
-    final usuarioId = firebaseAuth.currentUser!.uid;
+    final usuarioId = authController.usuario!.uid;
 
     final doc = firebaseFirestore.collection(collection).doc(usuarioId);
 
