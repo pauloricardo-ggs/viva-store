@@ -1,15 +1,21 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+
 import 'package:viva_store/models/produto.dart';
 
 class BotaoProdutoOferta extends StatelessWidget {
   final Produto produto;
+  final Function aoClicarNoCarrinho;
+  final bool noCarrinho;
 
   const BotaoProdutoOferta({
     Key? key,
     required this.produto,
+    required this.aoClicarNoCarrinho,
+    required this.noCarrinho,
   }) : super(key: key);
 
   @override
@@ -24,8 +30,8 @@ class BotaoProdutoOferta extends StatelessWidget {
           elevation: 1,
           child: Row(
             children: [
-              buildImagem(imagem: produto.imagensUrl[0]),
-              Expanded(
+              buildImagem(),
+              Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 8.0, top: 15.0, bottom: 8.0),
                   child: Column(
@@ -33,11 +39,11 @@ class BotaoProdutoOferta extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: buildNome(nome: produto.nome),
+                        child: buildNome(),
                       ),
-                      buildPrecos(cor: corPrimaria, preco: produto.preco, desconto: produto.porcentagemDesconto),
+                      buildPrecos(cor: corPrimaria),
                       const SizedBox(height: 10.0),
-                      buildBotoes(cor: corPrimaria, noCarrinho: true, favoritado: true),
+                      buildBotoes(cor: corPrimaria, favoritado: true),
                       const SizedBox(height: 10),
                     ],
                   ),
@@ -46,12 +52,12 @@ class BotaoProdutoOferta extends StatelessWidget {
             ],
           ),
         ),
-        buildTagDesconto(desconto: produto.porcentagemDesconto, cor: corPrimaria),
+        buildTagDesconto(cor: corPrimaria),
       ],
     );
   }
 
-  Widget buildTagDesconto({required int desconto, required Color cor}) {
+  Widget buildTagDesconto({required Color cor}) {
     return Align(
       alignment: Alignment.topLeft,
       child: SizedBox(
@@ -61,7 +67,7 @@ class BotaoProdutoOferta extends StatelessWidget {
           painter: PriceTagPaint(color: cor),
           child: Center(
             child: Text(
-              "-$desconto%   ",
+              "-${produto.porcentagemDesconto}%   ",
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -73,23 +79,32 @@ class BotaoProdutoOferta extends StatelessWidget {
     );
   }
 
-  Widget buildImagem({required String imagem}) {
-    return Flexible(
-      child: Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Get.isDarkMode ? const Color(0x61FFFFFF) : const Color(0xFFFFFFFF),
-            border: Border.all(color: Get.isDarkMode ? const Color(0xFF757575) : const Color(0xFFE0E0E0)),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
+  Widget buildImagem() {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Get.isDarkMode ? const Color(0x61FFFFFF) : const Color(0xFFFFFFFF),
+          border: Border.all(color: Get.isDarkMode ? const Color(0xFF757575) : const Color(0xFFE0E0E0)),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: SizedBox(
+          width: 160,
+          height: 160,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
-            child: Image(
-              image: NetworkImage(
-                imagem,
-                scale: 1,
-              ),
+            child: Image.network(
+              produto.imagensUrl[0],
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return SizedBox(
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -97,11 +112,11 @@ class BotaoProdutoOferta extends StatelessWidget {
     );
   }
 
-  Widget buildNome({required String nome}) {
+  Widget buildNome() {
     return Container(
       alignment: Alignment.centerLeft,
       child: Text(
-        nome,
+        produto.nome,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(fontSize: 16),
@@ -109,7 +124,7 @@ class BotaoProdutoOferta extends StatelessWidget {
     );
   }
 
-  Widget buildPrecos({required Color cor, required double preco, required int desconto}) {
+  Widget buildPrecos({required Color cor}) {
     var formatter = NumberFormat.currency(decimalDigits: 2, symbol: 'R\$');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +132,7 @@ class BotaoProdutoOferta extends StatelessWidget {
         FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            formatter.format(preco - (preco * desconto / 100)),
+            formatter.format(produto.preco - (produto.preco * produto.porcentagemDesconto / 100)),
             overflow: TextOverflow.visible,
             style: TextStyle(
               color: cor,
@@ -129,7 +144,7 @@ class BotaoProdutoOferta extends StatelessWidget {
         FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            formatter.format(preco),
+            formatter.format(produto.preco),
             style: const TextStyle(
               color: Colors.grey,
               fontWeight: FontWeight.bold,
@@ -144,7 +159,7 @@ class BotaoProdutoOferta extends StatelessWidget {
     );
   }
 
-  Widget buildBotoes({required Color cor, required bool noCarrinho, required bool favoritado}) {
+  Widget buildBotoes({required Color cor, required bool favoritado}) {
     return SizedBox(
       height: 30,
       child: Row(
@@ -163,9 +178,23 @@ class BotaoProdutoOferta extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8.0),
-          Icon(CupertinoIcons.cart_fill, size: 30, color: noCarrinho ? cor : Colors.grey.shade500),
+          IconButton(
+            onPressed: () => aoClicarNoCarrinho(),
+            icon: Icon(
+              CupertinoIcons.cart_fill,
+              size: 30,
+              color: noCarrinho ? cor : Colors.grey.shade500,
+            ),
+          ),
           const SizedBox(width: 8.0),
-          Icon(CupertinoIcons.heart_fill, size: 30, color: favoritado ? Colors.red : Colors.grey.shade500),
+          IconButton(
+            onPressed: () => {},
+            icon: Icon(
+              CupertinoIcons.heart_fill,
+              size: 30,
+              color: favoritado ? Colors.red : Colors.grey.shade500,
+            ),
+          ),
         ],
       ),
     );

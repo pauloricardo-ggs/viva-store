@@ -48,6 +48,7 @@ dependencies:
   validadores: ^1.0.5
   flutter_pw_validator: ^1.6.0
   firebase_storage: ^11.2.1
+  badges: ^3.1.1
 
 dev_dependencies:
   flutter_test:

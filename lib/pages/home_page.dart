@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart' as badges;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,7 +9,9 @@ import 'package:viva_store/components/HomePage/botao_banner.dart';
 import 'package:viva_store/components/HomePage/botao_categoria.dart';
 import 'package:viva_store/components/HomePage/botao_produto_oferta.dart';
 import 'package:viva_store/components/page_view_indicators.dart';
+import 'package:viva_store/controllers/carrinho_controller.dart';
 import 'package:viva_store/models/produto.dart';
+import 'package:viva_store/pages/cart_products.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final barraDePesquisaController = TextEditingController();
+  final carrinhoController = Get.put(CarrinhoController());
 
   int bannerAtual = 0;
   int quantidadeOfertasExibindo = 5;
@@ -61,14 +65,18 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              onPressed: () => {},
-              icon: Icon(
-                CupertinoIcons.cart_fill,
-                color: colorScheme.secondary,
-                size: 30,
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CartProducts())),
+              icon: badges.Badge(
+                badgeStyle: const badges.BadgeStyle(badgeColor: Colors.black),
+                badgeContent: Obx(() => Text('${carrinhoController.itens.length}', style: const TextStyle(color: Colors.white))),
+                child: Icon(
+                  CupertinoIcons.cart_fill,
+                  color: colorScheme.secondary,
+                  size: 30,
+                ),
               ),
             ),
-          )
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -170,12 +178,22 @@ class _HomePageState extends State<HomePage> {
 
             produtos = snapshot.data!;
             return ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                itemCount: produtos.length >= quantidadeOfertasExibindo ? quantidadeOfertasExibindo : produtos.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 8.0),
-                itemBuilder: (context, index) => SizedBox(height: 170, child: BotaoProdutoOferta(produto: produtos[index])));
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              itemCount: produtos.length >= quantidadeOfertasExibindo ? quantidadeOfertasExibindo : produtos.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 8.0),
+              itemBuilder: (context, index) => SizedBox(
+                height: 170,
+                child: Obx(
+                  () => BotaoProdutoOferta(
+                    produto: produtos[index],
+                    aoClicarNoCarrinho: () => carrinhoController.alternarSeEstaNoCarrinho(produtos[index].id),
+                    noCarrinho: carrinhoController.estaNoCarrinho(produtos[index].id),
+                  ),
+                ),
+              ),
+            );
           },
         ),
         const SizedBox(height: 3.0),
