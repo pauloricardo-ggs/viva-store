@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:viva_store/controllers/carrinho_controller.dart';
+import 'package:viva_store/models/produto.dart';
 
 class CartProducts extends StatelessWidget {
-  final CarrinhoController controller = Get.put(CarrinhoController());
+  final CarrinhoController _carrinhoController = Get.put(CarrinhoController());
 
   CartProducts({Key? key}) : super(key: key);
 
@@ -22,12 +23,15 @@ class CartProducts extends StatelessWidget {
       body: SizedBox(
         height: 600,
         child: ListView.builder(
-          itemCount: controller.itens.length,
+          itemCount: _carrinhoController.itens.length,
           itemBuilder: (BuildContext context, int index) {
-            return CartProductCard(
-              controller: controller,
-              produtoId: controller.itens.keys.toList()[index],
-              quantidade: controller.itens.values.toList()[index],
+            return Obx(
+              () => CartProductCard(
+                carrinhoController: _carrinhoController,
+                produtoId: _carrinhoController.itens.keys.toList()[index],
+                produto: _carrinhoController.produtos[index],
+                quantidade: _carrinhoController.itens.values.toList()[index],
+              ),
             );
           },
         ),
@@ -37,19 +41,29 @@ class CartProducts extends StatelessWidget {
 }
 
 class CartProductCard extends StatelessWidget {
-  final CarrinhoController controller;
+  final CarrinhoController carrinhoController;
   final String produtoId;
+  final Produto produto;
   final int quantidade;
 
   const CartProductCard({
     Key? key,
-    required this.controller,
+    required this.carrinhoController,
     required this.produtoId,
+    required this.produto,
     required this.quantidade,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Text(produtoId);
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Text('pelo item: $produtoId'),
+          Text('pelo produto ${produto.nome} - ${produto.id}'),
+          const SizedBox(height: 50),
+        ],
+      ),
+    );
   }
 }

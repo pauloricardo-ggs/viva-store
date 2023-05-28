@@ -10,9 +10,9 @@ class CarrinhoRepository {
 
   final collection = 'carrinhos';
 
-  Future obterItens() async {
+  Future<RxMap<dynamic, dynamic>> obterItens() async {
     if (authController.usuario == null) {
-      return;
+      return {}.obs;
     }
     final usuarioId = authController.usuario!.uid;
 

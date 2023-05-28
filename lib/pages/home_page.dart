@@ -12,7 +12,7 @@ import 'package:viva_store/components/page_view_indicators.dart';
 import 'package:viva_store/controllers/auth_controller.dart';
 import 'package:viva_store/controllers/carrinho_controller.dart';
 import 'package:viva_store/models/produto.dart';
-import 'package:viva_store/pages/cart_products.dart';
+import 'package:viva_store/pages/carrinho_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     if (authController.logado()) {
-      carrinhoController.carregarItens();
+      carrinhoController.recarregarCarrinho();
     } else {
       carrinhoController.itens.clear();
     }

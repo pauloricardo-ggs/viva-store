@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:viva_store/controllers/auth_controller.dart';
-import 'package:viva_store/pages/product/cadastrar_produto_page.dart';
+import 'package:viva_store/pages/cadastrar_produto_page.dart';
 
 class MinhaContaPage extends StatefulWidget {
   const MinhaContaPage({Key? key}) : super(key: key);

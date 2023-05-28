@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:viva_store/components/blurred_container.dart';
 import 'package:viva_store/pages/auth_page.dart';
-import 'package:viva_store/pages/favorites_page.dart';
+import 'package:viva_store/pages/favoritos_page.dart';
 import 'package:viva_store/pages/home_page.dart';
-import 'package:viva_store/pages/purchases_page.dart';
+import 'package:viva_store/pages/minhas_compras_page.dart';
 
 class BarraNavegacao extends StatefulWidget {
   const BarraNavegacao({super.key});
