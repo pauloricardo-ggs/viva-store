@@ -13,36 +13,59 @@ class CarrinhoController extends GetxController {
   final List<Produto> _produtos = [];
   List<Produto> get produtos => _produtos;
 
-  Future recarregarCarrinho() async {
+  Future obterCarrinho() async {
     final itens = await _carrinhoRepository.obterItens();
 
     _itens.clear();
     _produtos.clear();
     _itens.addAll(itens);
 
-    itens.forEach((key, value) async {
-      _produtos.add((await _produtoRepository.obter(key))!);
-    });
+    itens.forEach((key, value) async => _adicionarProduto(key));
   }
 
-  Future adicionarItem(String produtoId) async {
+  Future<void> adicionarQuantidadeDoItem(String produtoId) async {
     if (estaNoCarrinho(produtoId)) {
       _itens[produtoId] += 1;
     } else {
       _itens[produtoId] = 1;
+      _adicionarProduto(produtoId);
     }
+
     await _carrinhoRepository.atualizar(itens);
-    await recarregarCarrinho();
+  }
+
+  Future _adicionarProduto(String produtoId) async {
+    final produto = await _produtoRepository.obter(produtoId);
+    if (produto != null) _produtos.add(produto);
+  }
+
+  Future<void> diminuirQuantidadeDoItem(String produtoId) async {
+    if (_itens[produtoId] <= 1) {
+      removerItem(produtoId);
+    } else {
+      _itens[produtoId] -= 1;
+      await _carrinhoRepository.atualizar(itens);
+    }
+  }
+
+  Future<void> removerItem(String produtoId) async {
+    _itens.remove(produtoId);
+    _removerProduto(produtoId);
+
+    await _carrinhoRepository.atualizar(itens);
+  }
+
+  Future _removerProduto(String produtoId) async {
+    final produto = await _produtoRepository.obter(produtoId);
+    if (produto != null) _produtos.remove(produto);
   }
 
   Future alternarSeEstaNoCarrinho(String produtoId) async {
     if (estaNoCarrinho(produtoId)) {
-      _itens.remove(produtoId);
+      removerItem(produtoId);
     } else {
-      _itens[produtoId] = 1;
+      adicionarQuantidadeDoItem(produtoId);
     }
-    await _carrinhoRepository.atualizar(itens);
-    await recarregarCarrinho();
   }
 
   bool estaNoCarrinho(String produtoId) {

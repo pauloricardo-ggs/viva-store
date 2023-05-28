@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     if (authController.logado()) {
-      carrinhoController.recarregarCarrinho();
+      carrinhoController.obterCarrinho();
     } else {
       carrinhoController.itens.clear();
     }

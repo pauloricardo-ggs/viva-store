@@ -1,8 +1,8 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:viva_store/components/tag_desconto.dart';
 
 import 'package:viva_store/models/produto.dart';
 
@@ -64,7 +64,7 @@ class BotaoProdutoOferta extends StatelessWidget {
         height: 20,
         width: 58,
         child: CustomPaint(
-          painter: PriceTagPaint(color: cor),
+          painter: TagDesconto(color: cor),
           child: Center(
             child: Text(
               "-${produto.porcentagemDesconto}%   ",
@@ -199,39 +199,4 @@ class BotaoProdutoOferta extends StatelessWidget {
       ),
     );
   }
-}
-
-class PriceTagPaint extends CustomPainter {
-  const PriceTagPaint({required this.color});
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()
-      ..color = color
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.fill;
-
-    Path path = Path();
-
-    path
-      ..moveTo(0, 0)
-      ..lineTo(size.width * .87, 0)
-      ..lineTo(size.width, size.height * 0.5)
-      ..lineTo(size.width * .87, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-    canvas.drawPath(path, paint);
-
-    //* Circle
-    canvas.drawCircle(
-      Offset(size.width * .87, size.height * .5),
-      size.height * .15,
-      paint..color = Get.isDarkMode ? const Color(0xFF666666) : const Color(0xFFFFFFFF),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
