@@ -34,6 +34,14 @@ class Produto {
     required this.imagensUrl,
   });
 
+  double valorDesconto() {
+    return (preco * porcentagemDesconto / 100);
+  }
+
+  double precoComDesconto() {
+    return preco - valorDesconto();
+  }
+
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,

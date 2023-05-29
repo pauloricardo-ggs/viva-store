@@ -8,8 +8,8 @@ import 'package:validadores/Validador.dart';
 import 'package:viva_store/components/blurred_container.dart';
 import 'package:viva_store/controllers/auth_controller.dart';
 
-class SignupComponent extends StatefulWidget {
-  const SignupComponent({
+class SignupPage extends StatefulWidget {
+  const SignupPage({
     Key? key,
     required this.aoClicarEntrar,
   }) : super(key: key);
@@ -17,10 +17,10 @@ class SignupComponent extends StatefulWidget {
   final Function aoClicarEntrar;
 
   @override
-  State<SignupComponent> createState() => _SignupComponentState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _SignupComponentState extends State<SignupComponent> {
+class _SignupPageState extends State<SignupPage> {
   final _authController = Get.put(AuthController());
 
   final _formKey = GlobalKey<FormState>();

@@ -5,9 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:viva_store/components/HomePage/botao_banner.dart';
-import 'package:viva_store/components/HomePage/botao_categoria.dart';
-import 'package:viva_store/components/HomePage/botao_produto_oferta.dart';
+import 'package:viva_store/components/home/botao_banner.dart';
+import 'package:viva_store/components/home/botao_categoria.dart';
+import 'package:viva_store/components/home/botao_produto_oferta.dart';
 import 'package:viva_store/components/page_view_indicators.dart';
 import 'package:viva_store/controllers/auth_controller.dart';
 import 'package:viva_store/controllers/carrinho_controller.dart';
@@ -78,7 +78,7 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CartProducts())),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CarrinhoPage())),
               icon: badges.Badge(
                 badgeStyle: badges.BadgeStyle(badgeColor: authController.logado() ? Colors.black : Colors.transparent),
                 badgeContent: Obx(() => Text('${carrinhoController.itens.length}', style: TextStyle(color: authController.logado() ? Colors.white : Colors.transparent))),

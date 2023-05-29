@@ -1,15 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:viva_store/components/tag_desconto.dart';
-
+import 'package:viva_store/dev_pack.dart';
 import 'package:viva_store/models/produto.dart';
 
 class BotaoProdutoOferta extends StatelessWidget {
   final Produto produto;
   final Function aoClicarNoCarrinho;
   final bool noCarrinho;
+
+  final devPack = const DevPack();
 
   const BotaoProdutoOferta({
     Key? key,
@@ -33,18 +34,15 @@ class BotaoProdutoOferta extends StatelessWidget {
               buildImagem(),
               Flexible(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 8.0, top: 15.0, bottom: 8.0),
+                  padding: const EdgeInsets.only(left: 8.0, top: 15.0, bottom: 18.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: buildNome(),
-                      ),
+                      buildNome(),
                       buildPrecos(cor: corPrimaria),
                       const SizedBox(height: 10.0),
                       buildBotoes(cor: corPrimaria, favoritado: true),
-                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
@@ -125,14 +123,13 @@ class BotaoProdutoOferta extends StatelessWidget {
   }
 
   Widget buildPrecos({required Color cor}) {
-    var formatter = NumberFormat.currency(decimalDigits: 2, symbol: 'R\$');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            formatter.format(produto.preco - (produto.preco * produto.porcentagemDesconto / 100)),
+            devPack.formatarParaMoeda(produto.precoComDesconto()),
             overflow: TextOverflow.visible,
             style: TextStyle(
               color: cor,
@@ -144,7 +141,7 @@ class BotaoProdutoOferta extends StatelessWidget {
         FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
-            formatter.format(produto.preco),
+            devPack.formatarParaMoeda(produto.preco),
             style: const TextStyle(
               color: Colors.grey,
               fontWeight: FontWeight.bold,

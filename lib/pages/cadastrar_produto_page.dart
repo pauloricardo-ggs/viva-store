@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:viva_store/components/blurred_container.dart';
+import 'package:viva_store/dev_pack.dart';
 import 'package:viva_store/components/page_view_indicators.dart';
 import 'package:viva_store/models/produto.dart';
 
@@ -39,6 +40,8 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
   final estoqueController = TextEditingController();
   final porcentagemDescontoController = TextEditingController(text: "Não");
   final descricaoController = TextEditingController();
+
+  final snackBar = const DevPack();
 
   bool comprimentoVazio = false;
   bool larguraVazia = false;
@@ -179,7 +182,7 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
     setState(() => cadastrando = true);
 
     if (!existeAoMenosUmaFoto()) {
-      exibirMensagem('Adicione ao menos uma foto', sucesso: false);
+      snackBar.notificaoErro(mensagem: 'Adicione ao menos uma foto');
       camposValidos();
       setState(() => cadastrando = false);
       return;
@@ -201,7 +204,7 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
       }
     } catch (e) {
       setState(() => cadastrando = false);
-      exibirMensagem(e.toString(), sucesso: false);
+      snackBar.notificaoErro(mensagem: e.toString());
     }
 
     final json = Produto(
@@ -226,16 +229,7 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
     setState(() => cadastrando = false);
 
     if (context.mounted) Navigator.pop(context);
-    exibirMensagem('Produto cadastrado com sucesso');
-  }
-
-  void exibirMensagem(String mensagem, {bool sucesso = true}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-        backgroundColor: sucesso ? Colors.green : Colors.red.shade600,
-      ),
-    );
+    snackBar.notificaoSucesso(mensagem: 'Produto cadastrado com sucesso');
   }
 
   Widget buildNome() {

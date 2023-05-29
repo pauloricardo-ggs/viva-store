@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:viva_store/components/custom_snack_bar.dart';
+import 'package:viva_store/dev_pack.dart';
 import 'package:viva_store/repositorios/auth_repository.dart';
 
 class AuthController extends GetxController {
   final _authRepository = Get.put(AuthRepository());
 
-  final snackBar = const CustomSnackBar();
+  final snackBar = const DevPack();
   User? _usuario;
   User? get usuario => _usuario;
 
@@ -18,8 +18,9 @@ class AuthController extends GetxController {
     try {
       await _authRepository.logar(email, senha);
       _atualizarUsuarioLogado();
-    } on FirebaseAuthException catch (e) {
-      snackBar.erro(mensagem: e.code);
+    } on FirebaseAuthException {
+      snackBar.notificaoErro(mensagem: 'Usuário ou senha inválidos');
+      rethrow;
     }
   }
 
@@ -37,13 +38,13 @@ class AuthController extends GetxController {
       await _authRepository.cadastrarPerfilUsuario(credential.user!.uid, json);
 
       _usuario = credential.user;
-      snackBar.sucesso(mensagem: 'Usuário cadastrado com sucesso!');
+      snackBar.notificaoSucesso(mensagem: 'Usuário cadastrado com sucesso!');
       _atualizarUsuarioLogado();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
-        snackBar.erro(mensagem: 'Já existe uma conta com o email informado');
+        snackBar.notificaoErro(mensagem: 'Já existe uma conta com o email informado');
       } else {
-        snackBar.erro(mensagem: e.code);
+        snackBar.notificaoErro(mensagem: e.code);
       }
     }
   }
@@ -53,7 +54,7 @@ class AuthController extends GetxController {
       await _authRepository.sair();
       _atualizarUsuarioLogado();
     } on FirebaseAuthException catch (e) {
-      snackBar.erro(mensagem: e.code);
+      snackBar.notificaoErro(mensagem: e.code);
     }
   }
 

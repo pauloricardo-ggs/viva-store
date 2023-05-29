@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
-class CustomSnackBar {
-  const CustomSnackBar();
+class DevPack {
+  const DevPack();
 
   final duracaoBase = const Duration(seconds: 5);
 
-  void erro({String titulo = 'Oops!', required String mensagem, Duration? duracao}) {
+  void notificaoErro({String titulo = 'Oops!', required String mensagem, Duration? duracao}) {
     Get.snackbar(
       titulo,
       '',
@@ -29,7 +30,7 @@ class CustomSnackBar {
     );
   }
 
-  void sucesso({String titulo = 'Oba!', required String mensagem, Duration? duracao}) {
+  void notificaoSucesso({String titulo = 'Oba!', required String mensagem, Duration? duracao}) {
     Get.snackbar(
       titulo,
       '',
@@ -50,6 +51,19 @@ class CustomSnackBar {
         ],
       ),
     );
+  }
+
+  String formatarParaMoeda(double valor) {
+    var formatter = NumberFormat.currency(decimalDigits: 2, symbol: 'R\$');
+    return formatter.format(valor).replaceAll('.', ':').replaceAll(',', '.').replaceAll(':', ',');
+  }
+
+  double formatarParaDuasCasas(double valor) {
+    double valorArredondado = valor.floorToDouble();
+    String valorString = valorArredondado.toStringAsFixed(2);
+    double valorFormatado = double.parse(valorString);
+
+    return valorFormatado;
   }
 }
 

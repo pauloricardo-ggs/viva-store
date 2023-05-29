@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:viva_store/controllers/auth_controller.dart';
 
-class LoginComponent extends StatefulWidget {
-  const LoginComponent({
+class LoginPage extends StatefulWidget {
+  const LoginPage({
     Key? key,
     required this.aoClicarCadastrar,
   }) : super(key: key);
@@ -13,17 +13,16 @@ class LoginComponent extends StatefulWidget {
   final Function aoClicarCadastrar;
 
   @override
-  State<LoginComponent> createState() => _LoginComponentState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginComponentState extends State<LoginComponent> {
+class _LoginPageState extends State<LoginPage> {
   final _authController = Get.put(AuthController());
 
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
 
   bool _carregando = false;
-  bool _erro = false;
 
   @override
   void dispose() {
@@ -50,8 +49,6 @@ class _LoginComponentState extends State<LoginComponent> {
             buildBotaoEsqueciSenha(),
             const SizedBox(height: 15),
             buildBotaoEntrar(),
-            const SizedBox(height: 5),
-            buildMensagemErro(),
             const SizedBox(height: 10),
             buildBotaoCriarConta(),
           ],
@@ -63,14 +60,12 @@ class _LoginComponentState extends State<LoginComponent> {
   Future logar() async {
     setState(() {
       _carregando = true;
-      _erro = false;
     });
     try {
       await _authController.logar(email: _emailController.text, senha: _senhaController.text);
     } catch (e) {
       setState(() {
         _carregando = false;
-        _erro = true;
       });
     }
   }
@@ -149,14 +144,6 @@ class _LoginComponentState extends State<LoginComponent> {
             ),
             child: const Text('Entrar', style: TextStyle(fontSize: 20)),
           );
-  }
-
-  Widget buildMensagemErro() {
-    return Text(
-      "Usuário ou senha inválidos",
-      style: TextStyle(color: _erro ? Colors.red : Colors.transparent),
-      textAlign: TextAlign.center,
-    );
   }
 
   Widget buildBotaoCriarConta() {
