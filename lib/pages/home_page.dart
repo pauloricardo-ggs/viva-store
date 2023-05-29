@@ -11,6 +11,7 @@ import 'package:viva_store/components/home/botao_produto_oferta.dart';
 import 'package:viva_store/components/page_view_indicators.dart';
 import 'package:viva_store/controllers/auth_controller.dart';
 import 'package:viva_store/controllers/carrinho_controller.dart';
+import 'package:viva_store/controllers/favoritos_controller.dart';
 import 'package:viva_store/models/produto.dart';
 import 'package:viva_store/pages/carrinho_page.dart';
 
@@ -39,6 +40,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   final carrinhoController = Get.put(CarrinhoController());
+  final favoritosController = Get.put(FavoritosController());
   final authController = Get.put(AuthController());
 
   final barraDePesquisaController = TextEditingController();
@@ -51,8 +53,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     if (authController.logado()) {
       carrinhoController.obterCarrinho();
+      favoritosController.obterFavoritos();
     } else {
       carrinhoController.itens.clear();
+      favoritosController.produtosId.clear();
     }
     super.initState();
   }
@@ -202,7 +206,9 @@ class _HomePageState extends State<HomePage> {
                   () => BotaoProdutoOferta(
                     produto: produtos[index],
                     aoClicarNoCarrinho: () => carrinhoController.alternarSeEstaNoCarrinho(produtos[index].id),
+                    aoClicarNosFavoritos: () => favoritosController.alternarSeEstaNoFavorito(produtos[index].id),
                     noCarrinho: carrinhoController.estaNoCarrinho(produtos[index].id),
+                    nosFavoritos: favoritosController.estaNosFavoritos(produtos[index].id),
                   ),
                 ),
               ),

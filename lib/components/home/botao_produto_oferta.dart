@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:viva_store/components/tag_desconto.dart';
 import 'package:viva_store/dev_pack.dart';
 import 'package:viva_store/models/produto.dart';
@@ -8,7 +9,9 @@ import 'package:viva_store/models/produto.dart';
 class BotaoProdutoOferta extends StatelessWidget {
   final Produto produto;
   final Function aoClicarNoCarrinho;
+  final Function aoClicarNosFavoritos;
   final bool noCarrinho;
+  final bool nosFavoritos;
 
   final devPack = const DevPack();
 
@@ -16,7 +19,9 @@ class BotaoProdutoOferta extends StatelessWidget {
     Key? key,
     required this.produto,
     required this.aoClicarNoCarrinho,
+    required this.aoClicarNosFavoritos,
     required this.noCarrinho,
+    required this.nosFavoritos,
   }) : super(key: key);
 
   @override
@@ -50,7 +55,7 @@ class BotaoProdutoOferta extends StatelessWidget {
             ],
           ),
         ),
-        buildTagDesconto(cor: corPrimaria),
+        produto.porcentagemDesconto != 0 ? buildTagDesconto(cor: corPrimaria) : const SizedBox.shrink(),
       ],
     );
   }
@@ -138,20 +143,22 @@ class BotaoProdutoOferta extends StatelessWidget {
             ),
           ),
         ),
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            devPack.formatarParaMoeda(produto.preco),
-            style: const TextStyle(
-              color: Colors.grey,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              decoration: TextDecoration.lineThrough,
-              decorationThickness: 1.5,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
+        produto.porcentagemDesconto != 0
+            ? FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  devPack.formatarParaMoeda(produto.preco),
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    decoration: TextDecoration.lineThrough,
+                    decorationThickness: 1.5,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              )
+            : const SizedBox.shrink(),
       ],
     );
   }
@@ -185,11 +192,11 @@ class BotaoProdutoOferta extends StatelessWidget {
           ),
           const SizedBox(width: 8.0),
           IconButton(
-            onPressed: () => {},
+            onPressed: () => aoClicarNosFavoritos(),
             icon: Icon(
               CupertinoIcons.heart_fill,
               size: 30,
-              color: favoritado ? Colors.red : Colors.grey.shade500,
+              color: nosFavoritos ? Colors.red : Colors.grey.shade500,
             ),
           ),
         ],

@@ -8,30 +8,4 @@ class ProdutoController extends GetxController {
   Future<Produto?> obter(String produtoId) async {
     return await _produtoRepository.obter(produtoId);
   }
-
-  // Future<Produto?> obter(String produtoId) async {
-  //   return await _produtoRepository.obter(produtoId);
-  // }
-
-  // Future adicionarItem(String produtoId) async {
-  //   if (estaNoCarrinho(produtoId)) {
-  //     _itens[produtoId] += 1;
-  //   } else {
-  //     _itens[produtoId] = 1;
-  //   }
-  //   await _carrinhoRepository.atualizar(itens);
-  // }
-
-  // Future alternarSeEstaNoCarrinho(String produtoId) async {
-  //   if (estaNoCarrinho(produtoId)) {
-  //     _itens.remove(produtoId);
-  //   } else {
-  //     _itens[produtoId] = 1;
-  //   }
-  //   await _carrinhoRepository.atualizar(itens);
-  // }
-
-  // bool estaNoCarrinho(String produtoId) {
-  //   return _itens.containsKey(produtoId);
-  // }
 }
