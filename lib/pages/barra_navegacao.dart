@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:viva_store/components/blurred_container.dart';
+import 'package:viva_store/controllers/auth_controller.dart';
+import 'package:viva_store/dev_pack.dart';
 import 'package:viva_store/pages/auth_page.dart';
 import 'package:viva_store/pages/favoritos_page.dart';
 import 'package:viva_store/pages/home_page.dart';
@@ -15,12 +17,16 @@ class BarraNavegacao extends StatefulWidget {
 }
 
 class _BarraNavegacaoState extends State<BarraNavegacao> {
+  final _authController = Get.put(AuthController());
+  final _devPack = const DevPack();
   int _currentPage = 0;
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
-      const HomePage(),
+      HomePage(
+        irParaTelaDeLogin: () => setState(() => _currentPage = 3),
+      ),
       const FavoritesPage(),
       const PurchasesPage(),
       const AuthPage(),
@@ -41,6 +47,16 @@ class _BarraNavegacaoState extends State<BarraNavegacao> {
                   selectedFontSize: 12,
                   currentIndex: _currentPage,
                   onTap: (value) {
+                    if (!_authController.logado()) {
+                      if (value == 1) {
+                        _devPack.notificaoErro(mensagem: 'Você precisa estar logado para ver seus produtos favoritos');
+                        return;
+                      }
+                      if (value == 2) {
+                        _devPack.notificaoErro(mensagem: 'Você precisa estar logado para ver suas compras');
+                        return;
+                      }
+                    }
                     setState(() => _currentPage = value);
                   },
                   items: const [

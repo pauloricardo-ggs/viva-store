@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:badges/badges.dart' as badges;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,7 +17,12 @@ import 'package:viva_store/models/produto.dart';
 import 'package:viva_store/pages/carrinho_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Function irParaTelaDeLogin;
+
+  const HomePage({
+    Key? key,
+    required this.irParaTelaDeLogin,
+  }) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -82,7 +88,10 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CarrinhoPage())),
+              onPressed: () {
+                if (authController.logado()) Navigator.push(context, MaterialPageRoute(builder: (context) => const CarrinhoPage()));
+                widget.irParaTelaDeLogin();
+              },
               icon: badges.Badge(
                 badgeStyle: badges.BadgeStyle(badgeColor: authController.logado() ? Colors.black : Colors.transparent),
                 badgeContent: Obx(() => Text('${carrinhoController.itens.length}', style: TextStyle(color: authController.logado() ? Colors.white : Colors.transparent))),
@@ -205,8 +214,14 @@ class _HomePageState extends State<HomePage> {
                 child: Obx(
                   () => BotaoProdutoOferta(
                     produto: produtos[index],
-                    aoClicarNoCarrinho: () => carrinhoController.alternarSeEstaNoCarrinho(produtos[index].id),
-                    aoClicarNosFavoritos: () => favoritosController.alternarSeEstaNoFavorito(produtos[index].id),
+                    aoClicarNoCarrinho: () {
+                      if (authController.logado()) return carrinhoController.alternarSeEstaNoCarrinho(produtos[index].id);
+                      widget.irParaTelaDeLogin();
+                    },
+                    aoClicarNosFavoritos: () {
+                      if (authController.logado()) return favoritosController.alternarSeEstaNoFavorito(produtos[index].id);
+                      widget.irParaTelaDeLogin();
+                    },
                     noCarrinho: carrinhoController.estaNoCarrinho(produtos[index].id),
                     nosFavoritos: favoritosController.estaNosFavoritos(produtos[index].id),
                   ),
