@@ -71,4 +71,12 @@ class CarrinhoController extends GetxController {
   bool estaNoCarrinho(String produtoId) {
     return _itens.containsKey(produtoId);
   }
+
+  int quantidadeDeItens() {
+    var quantidade = 0;
+    _itens.forEach((key, value) {
+      quantidade += value as int;
+    });
+    return quantidade;
+  }
 }

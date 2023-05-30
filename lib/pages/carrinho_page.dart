@@ -17,11 +17,11 @@ class CarrinhoPage extends StatefulWidget {
 class _CarrinhoPageState extends State<CarrinhoPage> {
   final _carrinhoController = Get.put(CarrinhoController());
   final _cepController = TextEditingController();
-  final devPack = const DevPack();
+  final _devPack = const DevPack();
+  final _cepKey = GlobalKey<FormState>();
 
-  bool detalhesExpandido = false;
-  double? frete;
-  String? prazoEntrega;
+  double? _frete;
+  String? _prazoEntrega;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +58,7 @@ class _CarrinhoPageState extends State<CarrinhoPage> {
               valorTotal: calcularValorTotal(),
               precoProdutos: calcularPrecoProdutos(),
               valorDescontos: calcularDescontoProdutos(),
-              valorFrete: frete,
+              valorFrete: _frete,
             ),
           )
         ],
@@ -76,19 +76,22 @@ class _CarrinhoPageState extends State<CarrinhoPage> {
         children: [
           SizedBox(
             width: 120,
-            child: TextFormField(
-              controller: _cepController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [mask],
-              decoration: InputDecoration(
-                label: const Text('CEP'),
-                enabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                  borderRadius: BorderRadius.horizontal(left: Radius.circular(8)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: corPrimaria),
-                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
+            child: Form(
+              key: _cepKey,
+              child: TextFormField(
+                controller: _cepController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [mask],
+                decoration: InputDecoration(
+                  label: const Text('CEP'),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.horizontal(left: Radius.circular(8)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: corPrimaria),
+                    borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
+                  ),
                 ),
               ),
             ),
@@ -102,24 +105,20 @@ class _CarrinhoPageState extends State<CarrinhoPage> {
                   borderRadius: BorderRadius.horizontal(right: Radius.circular(8)),
                 ),
               )),
-              onPressed: () {
-                FocusScope.of(context).unfocus();
-                calcularValorFrete();
-                obterPrazoEntrega();
-              },
+              onPressed: () => _cepController.text.length == 9 ? calcularFreteEPrazo() : resetarFreteEPrazo(),
               child: const Text('OK', style: TextStyle(fontSize: 16)),
             ),
           ),
           const SizedBox(width: 15),
-          frete == null
+          _frete == null
               ? const SizedBox.shrink()
               : Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Frete: ${devPack.formatarParaMoeda(frete!)}'),
-                      Text('$prazoEntrega'),
+                      Text(_frete == 0 ? 'Oba! Frete grátis!' : 'Frete: ${_devPack.formatarParaMoeda(_frete!)}'),
+                      Text('$_prazoEntrega'),
                     ],
                   ),
                 ),
@@ -157,7 +156,7 @@ class _CarrinhoPageState extends State<CarrinhoPage> {
       final produto = _carrinhoController.produtos.firstWhere((produto) => produto.id == produtoId);
       precoProdutos += (produto.preco * quantidade);
     });
-    return devPack.formatarParaDuasCasas(precoProdutos);
+    return _devPack.formatarParaDuasCasas(precoProdutos);
   }
 
   double calcularDescontoProdutos() {
@@ -166,20 +165,37 @@ class _CarrinhoPageState extends State<CarrinhoPage> {
       final produto = _carrinhoController.produtos.firstWhere((produto) => produto.id == produtoId);
       desconto += (produto.valorDesconto() * quantidade);
     });
-    return devPack.formatarParaDuasCasas(desconto);
+    return _devPack.formatarParaDuasCasas(desconto);
   }
 
   double calcularValorTotal() {
     double total = 0.0;
-    total = calcularPrecoProdutos() - calcularDescontoProdutos() + (frete ?? 0);
-    return devPack.formatarParaDuasCasas(total);
+    total = calcularPrecoProdutos() - calcularDescontoProdutos() + (_frete ?? 0);
+    return _devPack.formatarParaDuasCasas(total);
   }
 
-  void calcularValorFrete() {
-    setState(() => frete = _cepController.text.isEmpty ? null : 10);
+  void calcularFreteEPrazo() {
+    FocusScope.of(context).unfocus();
+    var frete = 0.0;
+
+    final quantidadeItens = _carrinhoController.quantidadeDeItens();
+
+    if (quantidadeItens <= 5) frete = 0;
+    if (5 < quantidadeItens && quantidadeItens <= 10) frete = 13.99;
+    if (10 < quantidadeItens && quantidadeItens <= 15) frete = 27.50;
+    if (15 < quantidadeItens) frete = 52.80;
+
+    setState(() {
+      _frete = _cepController.text.isEmpty ? null : frete;
+      _prazoEntrega = _cepController.text.isEmpty ? null : 'De 5 a 10 dias úteis';
+    });
   }
 
-  void obterPrazoEntrega() {
-    setState(() => prazoEntrega = _cepController.text.isEmpty ? null : 'De 5 a 10 dias úteis');
+  void resetarFreteEPrazo() {
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _frete = null;
+      _prazoEntrega = null;
+    });
   }
 }
