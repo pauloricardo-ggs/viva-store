@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:viva_store/components/home/botao_produto_oferta.dart';
+import 'package:viva_store/components/produto_card.dart';
 import 'package:viva_store/controllers/auth_controller.dart';
 import 'package:viva_store/controllers/carrinho_controller.dart';
 import 'package:viva_store/controllers/favoritos_controller.dart';
@@ -54,7 +54,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
             itemBuilder: (context, index) => SizedBox(
               height: 170,
               child: Obx(
-                () => BotaoProdutoOferta(
+                () => ProdutoCard(
                   produto: produtos[index],
                   aoClicarNoCarrinho: () => carrinhoController.alternarSeEstaNoCarrinho(produtos[index].id),
                   aoClicarNosFavoritos: () => favoritosController.alternarSeEstaNoFavorito(produtos[index].id),

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 class DevPack {
   const DevPack();
 
-  final duracaoBase = const Duration(seconds: 5);
+  final duracaoBase = const Duration(seconds: 3);
 
   void notificaoErro({String titulo = 'Oops!', required String mensagem, Duration? duracao}) {
     Get.snackbar(

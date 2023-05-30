@@ -89,7 +89,7 @@ class _BarraNavegacaoState extends State<BarraNavegacao> {
   Widget buildPage(Pages page) {
     switch (page) {
       case Pages.homePage:
-        return HomePage(irParaTelaDeLogin: () => setState(() => _currentPage = Pages.loginPage));
+        return HomePage(irParaTelaDeLogin: () => setState(() => _currentPage = Pages.authPage));
       case Pages.favoritesPage:
         return const FavoritesPage();
       case Pages.purchasesPage:

@@ -5,6 +5,7 @@ import 'package:viva_store/components/tag_desconto.dart';
 import 'package:viva_store/controllers/carrinho_controller.dart';
 import 'package:viva_store/dev_pack.dart';
 import 'package:viva_store/models/produto.dart';
+import 'package:viva_store/pages/produto_detalhes_page.dart';
 
 class ProdutoCarrinhoCard extends StatelessWidget {
   final CarrinhoController carrinhoController;
@@ -24,59 +25,62 @@ class ProdutoCarrinhoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final corPrimaria = Theme.of(context).colorScheme.primary;
 
-    return Stack(
-      children: [
-        Badge(
-          backgroundColor: Colors.transparent,
-          largeSize: 40,
-          offset: const Offset(10, -15),
-          label: GestureDetector(
-            onTap: () => carrinhoController.removerItem(produto.id),
-            child: const SizedBox(
-              height: 40,
-              width: 40,
-              child: Icon(
-                CupertinoIcons.xmark_circle_fill,
-                color: Colors.red,
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProdutoDetalhesPage(produto: produto))),
+      child: Stack(
+        children: [
+          Badge(
+            backgroundColor: Colors.transparent,
+            largeSize: 40,
+            offset: const Offset(10, -15),
+            label: GestureDetector(
+              onTap: () => carrinhoController.removerItem(produto.id),
+              child: const SizedBox(
+                height: 40,
+                width: 40,
+                child: Icon(
+                  CupertinoIcons.xmark_circle_fill,
+                  color: Colors.red,
+                ),
               ),
             ),
-          ),
-          child: Material(
-            color: Get.isDarkMode ? const Color(0x18FFFFFF) : const Color(0xCEFFFFFF),
-            borderRadius: BorderRadius.circular(8.0),
-            elevation: 1,
-            child: SizedBox(
-              height: 100,
-              child: Row(
-                children: [
-                  buildImagem(),
-                  Flexible(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          buildNome(),
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                buildPrecos(cor: corPrimaria),
-                                buildBotoes(cor: corPrimaria, favoritado: true),
-                              ],
+            child: Material(
+              color: Get.isDarkMode ? const Color(0x18FFFFFF) : const Color(0xCEFFFFFF),
+              borderRadius: BorderRadius.circular(8.0),
+              elevation: 1,
+              child: SizedBox(
+                height: 100,
+                child: Row(
+                  children: [
+                    buildImagem(),
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 5.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            buildNome(),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  buildPrecos(cor: corPrimaria),
+                                  buildBotoes(cor: corPrimaria, favoritado: true),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        produto.porcentagemDesconto != 0 ? buildTagDesconto(cor: corPrimaria) : const SizedBox.shrink(),
-      ],
+          produto.porcentagemDesconto != 0 ? buildTagDesconto(cor: corPrimaria) : const SizedBox.shrink(),
+        ],
+      ),
     );
   }
 

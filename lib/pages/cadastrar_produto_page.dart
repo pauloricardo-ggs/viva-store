@@ -570,7 +570,7 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
     return TextFormField(
       minLines: 10,
       maxLines: 20,
-      maxLength: 1000,
+      maxLength: 2000,
       decoration: const InputDecoration(
         label: Text('Descrição'),
         alignLabelWithHint: true,
@@ -679,8 +679,11 @@ class _CarrosselDeImagensState extends State<CarrosselDeImagens> {
     return GestureDetector(
       onTap: () => _frontImage == index ? setState(() => _tapped = true) : null,
       child: Container(
+        height: 250.0,
+        width: 250.0,
         decoration: BoxDecoration(
           color: isDark ? secondary.withOpacity(0.2) : secondary.withOpacity(0.16),
+          border: Border.all(color: secondary),
           borderRadius: BorderRadius.circular(15.0),
           image: DecorationImage(image: FileImage(widget.images[index]), fit: BoxFit.cover),
         ),

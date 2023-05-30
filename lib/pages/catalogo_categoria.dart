@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:viva_store/components/home/botao_produto_oferta.dart';
+import 'package:viva_store/components/produto_card.dart';
 import 'package:viva_store/controllers/auth_controller.dart';
 import 'package:viva_store/controllers/carrinho_controller.dart';
 import 'package:viva_store/controllers/favoritos_controller.dart';
@@ -131,7 +131,7 @@ class _CatalogoPageState extends State<CatalogoPage> {
               itemBuilder: (context, index) => SizedBox(
                 height: 170,
                 child: Obx(
-                  () => BotaoProdutoOferta(
+                  () => ProdutoCard(
                     produto: produtos[index],
                     aoClicarNoCarrinho: () {
                       if (authController.logado()) return carrinhoController.alternarSeEstaNoCarrinho(produtos[index].id);

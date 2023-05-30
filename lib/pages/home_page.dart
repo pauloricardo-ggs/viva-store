@@ -7,12 +7,13 @@ import 'package:get/get.dart';
 
 import 'package:viva_store/components/home/botao_banner.dart';
 import 'package:viva_store/components/home/botao_categoria.dart';
-import 'package:viva_store/components/home/botao_produto_oferta.dart';
+import 'package:viva_store/components/produto_card.dart';
 import 'package:viva_store/components/page_view_indicators.dart';
 import 'package:viva_store/controllers/auth_controller.dart';
 import 'package:viva_store/controllers/carrinho_controller.dart';
 import 'package:viva_store/controllers/categorias_controller.dart';
 import 'package:viva_store/controllers/favoritos_controller.dart';
+import 'package:viva_store/dev_pack.dart';
 import 'package:viva_store/models/categoria.dart';
 import 'package:viva_store/models/produto.dart';
 import 'package:viva_store/pages/carrinho_page.dart';
@@ -43,6 +44,8 @@ class _HomePageState extends State<HomePage> {
 
   final barraDePesquisaController = TextEditingController();
 
+  final devPack = const DevPack();
+
   int bannerAtual = 0;
   int quantidadeOfertasExibindo = 5;
   List<Produto> produtos = [];
@@ -54,6 +57,9 @@ class _HomePageState extends State<HomePage> {
     if (authController.logado()) {
       carrinhoController.obterCarrinho();
       favoritosController.obterFavoritos();
+    } else {
+      carrinhoController.limpar();
+      favoritosController.limpar();
     }
     super.initState();
   }
@@ -207,16 +213,16 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) => SizedBox(
                 height: 170,
                 child: Obx(
-                  () => BotaoProdutoOferta(
+                  () => ProdutoCard(
                     produto: produtos[index],
                     aoClicarNoCarrinho: () {
                       if (authController.logado()) return carrinhoController.alternarSeEstaNoCarrinho(produtos[index].id);
-                      widget.irParaTelaDeLogin();
+                      devPack.notificaoErro(mensagem: 'Você precisa estar logado adicionar esse item ao seu carrinho');
                     },
                     aoClicarNosFavoritos: () {
                       if (authController.logado()) return favoritosController.alternarSeEstaNoFavorito(produtos[index].id);
 
-                      widget.irParaTelaDeLogin();
+                      devPack.notificaoErro(mensagem: 'Você precisa estar logado para favoritar esse item');
                     },
                     noCarrinho: carrinhoController.estaNoCarrinho(produtos[index].id),
                     nosFavoritos: favoritosController.estaNosFavoritos(produtos[index].id),
