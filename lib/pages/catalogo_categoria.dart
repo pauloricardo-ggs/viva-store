@@ -1,56 +1,43 @@
 import 'package:badges/badges.dart' as badges;
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:viva_store/components/home/botao_banner.dart';
-import 'package:viva_store/components/home/botao_categoria.dart';
 import 'package:viva_store/components/home/botao_produto_oferta.dart';
-import 'package:viva_store/components/page_view_indicators.dart';
 import 'package:viva_store/controllers/auth_controller.dart';
 import 'package:viva_store/controllers/carrinho_controller.dart';
-import 'package:viva_store/controllers/categorias_controller.dart';
 import 'package:viva_store/controllers/favoritos_controller.dart';
-import 'package:viva_store/models/categoria.dart';
+import 'package:viva_store/controllers/produtos_controller.dart';
 import 'package:viva_store/models/produto.dart';
 import 'package:viva_store/pages/carrinho_page.dart';
 
-class HomePage extends StatefulWidget {
+class CatalogoPage extends StatefulWidget {
   final Function irParaTelaDeLogin;
+  final String categoria;
 
-  const HomePage({
+  const CatalogoPage({
     Key? key,
     required this.irParaTelaDeLogin,
+    required this.categoria,
   }) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<CatalogoPage> createState() => _CatalogoPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  final List<String> banners = [
-    "images/home_page/banners/oferta_decoracao.png",
-    "images/home_page/banners/oferta_roupa.jpg",
-    "images/home_page/banners/oferta_banheiro.jpg",
-  ];
-
-  final authController = Get.put(AuthController());
+class _CatalogoPageState extends State<CatalogoPage> {
   final carrinhoController = Get.put(CarrinhoController());
   final favoritosController = Get.put(FavoritosController());
-  final categoriasController = Get.put(CategoriasController());
+  final produtosController = Get.put(ProdutosController());
+  final authController = Get.put(AuthController());
 
   final barraDePesquisaController = TextEditingController();
 
-  int bannerAtual = 0;
-  int quantidadeOfertasExibindo = 5;
+  int quantidadeOfertasExibindo = 10;
   List<Produto> produtos = [];
-  List<Categoria> categorias = [];
 
   @override
   void initState() {
-    categorias = categoriasController.listar();
     if (authController.logado()) {
       carrinhoController.obterCarrinho();
       favoritosController.obterFavoritos();
@@ -66,19 +53,9 @@ class _HomePageState extends State<HomePage> {
     var colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 10.0),
-          child: buildBarraDePesquisa(),
-        ),
+        title: buildBarraDePesquisa(),
         titleSpacing: 0,
         actions: [
-          IconButton(
-            onPressed: () => Get.changeThemeMode(Get.isDarkMode ? ThemeMode.light : ThemeMode.dark),
-            icon: Icon(
-              Get.isDarkMode ? CupertinoIcons.sun_min_fill : CupertinoIcons.moon_fill,
-              color: colorScheme.secondary,
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
@@ -105,11 +82,7 @@ class _HomePageState extends State<HomePage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            buildCategorias(),
-            const SizedBox(height: 10),
-            buildBanners(),
-            PageViewIndicators(numberOfPages: banners.length, selectedPage: bannerAtual),
-            buildProdutosEmOferta(),
+            buildProdutos(),
             const SizedBox(height: 100),
           ],
         ),
@@ -128,7 +101,7 @@ class _HomePageState extends State<HomePage> {
           prefixIcon: const Icon(CupertinoIcons.search),
           prefixIconColor: Colors.black45,
           fillColor: Theme.of(context).colorScheme.secondary,
-          hintText: "Pesquisar",
+          hintText: "Pesquisar em ${widget.categoria}",
           hintStyle: const TextStyle(color: Colors.black45),
           focusedBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(15.0)),
@@ -139,61 +112,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildCategorias() {
-    return SizedBox(
-      height: 100,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: categorias.length,
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        separatorBuilder: (context, index) => const SizedBox(width: 8.0),
-        itemBuilder: (context, i) => Center(
-          child: BotaoCategoria(
-            nome: categorias[i].nome,
-            icone: categorias[i].icone,
-            cor: Theme.of(context).colorScheme.secondary,
-            irParaTelaDeLogin: widget.irParaTelaDeLogin,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildBanners() {
-    return CarouselSlider.builder(
-      itemCount: banners.length,
-      itemBuilder: (context, index, realIndex) => BotaoBanner(imagem: banners[index]),
-      options: CarouselOptions(
-        height: 200,
-        onPageChanged: (index, reason) => setState(() => bannerAtual = index),
-        enlargeCenterPage: true,
-        enlargeFactor: 0.2,
-        autoPlayAnimationDuration: const Duration(milliseconds: 1500),
-        autoPlay: true,
-        pauseAutoPlayOnManualNavigate: true,
-        pauseAutoPlayOnTouch: true,
-        autoPlayInterval: const Duration(seconds: 10),
-      ),
-    );
-  }
-
-  Widget buildProdutosEmOferta() {
+  Widget buildProdutos() {
     return Column(
       children: [
-        Container(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: const Text(
-            "Ofertas",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8.0),
+        const SizedBox(height: 12.0),
         StreamBuilder<List<Produto>>(
-          stream: obterProdutos(),
+          stream: produtosController.obterPorCategoria(widget.categoria),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text(snapshot.error.toString());
@@ -240,12 +164,14 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
+}
 
-  Stream<List<Produto>> obterProdutos() {
-    return FirebaseFirestore.instance
-        .collection('produtos')
-        .where('porcentagemDesconto', isNotEqualTo: 0)
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => Produto.fromMap(doc.data())).toList());
-  }
+class Categoria {
+  String nome;
+  IconData icon;
+
+  Categoria({
+    required this.nome,
+    required this.icon,
+  });
 }

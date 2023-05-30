@@ -10,8 +10,10 @@ import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:viva_store/components/blurred_container.dart';
+import 'package:viva_store/controllers/categorias_controller.dart';
 import 'package:viva_store/dev_pack.dart';
 import 'package:viva_store/components/page_view_indicators.dart';
+import 'package:viva_store/models/categoria.dart';
 import 'package:viva_store/models/produto.dart';
 
 class CadastrarProdutoPage extends StatefulWidget {
@@ -24,12 +26,9 @@ class CadastrarProdutoPage extends StatefulWidget {
 class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
   final _formKey = GlobalKey<FormState>();
 
-  late String categoriaSelecionada;
+  late Categoria categoriaSelecionada;
   late String escalaDimensaoSelecionada;
   late String escalaPesoSelecionada;
-
-  late List<String> categorias;
-  final List<File> _imagens = [];
 
   final nomeController = TextEditingController();
   final precoController = TextEditingController(text: "R\$ 0,00");
@@ -41,8 +40,12 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
   final porcentagemDescontoController = TextEditingController(text: "Não");
   final descricaoController = TextEditingController();
 
-  final snackBar = const DevPack();
+  final CategoriasController _categoriasController = Get.put(CategoriasController());
 
+  final devPack = const DevPack();
+
+  final List<File> _imagens = [];
+  List<Categoria> categorias = [];
   bool comprimentoVazio = false;
   bool larguraVazia = false;
   bool alturaVazia = false;
@@ -56,7 +59,7 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
   @override
   void initState() {
     setState(() {
-      categorias = obterCategorias();
+      categorias = _categoriasController.listar();
       categoriaSelecionada = categorias.first;
       escalaDimensaoSelecionada = "mm";
       escalaPesoSelecionada = "g";
@@ -182,7 +185,7 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
     setState(() => cadastrando = true);
 
     if (!existeAoMenosUmaFoto()) {
-      snackBar.notificaoErro(mensagem: 'Adicione ao menos uma foto');
+      devPack.notificaoErro(mensagem: 'Adicione ao menos uma foto');
       camposValidos();
       setState(() => cadastrando = false);
       return;
@@ -204,7 +207,7 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
       }
     } catch (e) {
       setState(() => cadastrando = false);
-      snackBar.notificaoErro(mensagem: e.toString());
+      devPack.notificaoErro(mensagem: e.toString());
     }
 
     final json = Produto(
@@ -219,7 +222,7 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
             escalaDimensao: escalaDimensaoSelecionada,
             peso: double.parse(pesoController.value.text.replaceAll(',', '.')),
             escalaPeso: escalaPesoSelecionada,
-            categoria: categoriaSelecionada,
+            categoria: categoriaSelecionada.nome,
             descricao: descricaoController.value.text,
             imagensUrl: imagensUrl)
         .toMap();
@@ -229,7 +232,7 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
     setState(() => cadastrando = false);
 
     if (context.mounted) Navigator.pop(context);
-    snackBar.notificaoSucesso(mensagem: 'Produto cadastrado com sucesso');
+    devPack.notificaoSucesso(mensagem: 'Produto cadastrado com sucesso');
   }
 
   Widget buildNome() {
@@ -542,20 +545,20 @@ class _CadastrarProdutoPageState extends State<CadastrarProdutoPage> {
               borderRadius: BorderRadius.circular(15.0),
               onTap: () => trocarFoco(),
               items: categorias.map(
-                (String category) {
-                  return DropdownMenuItem<String>(
-                    value: category,
+                (Categoria categoria) {
+                  return DropdownMenuItem<Categoria>(
+                    value: categoria,
                     child: SizedBox(
                       width: constraints.maxWidth - 50,
                       child: Text(
-                        category,
+                        categoria.nome,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   );
                 },
               ).toList(),
-              onChanged: (newValue) => setState(() => categoriaSelecionada = newValue!),
+              onChanged: (novaCategoria) => setState(() => categoriaSelecionada = novaCategoria!),
             );
           },
         ),

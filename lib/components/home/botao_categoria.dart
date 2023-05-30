@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:viva_store/pages/catalogo_categoria.dart';
 
 class BotaoCategoria extends StatelessWidget {
   final Color cor;
   final IconData? icone;
   final String nome;
+  final Function irParaTelaDeLogin;
 
   const BotaoCategoria({
     Key? key,
-    required this.icone,
     required this.cor,
+    required this.icone,
     required this.nome,
+    required this.irParaTelaDeLogin,
   }) : super(key: key);
 
   @override
@@ -25,7 +28,10 @@ class BotaoCategoria extends StatelessWidget {
             color: cor,
           ),
           child: IconButton(
-            onPressed: () => {},
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CatalogoPage(categoria: nome, irParaTelaDeLogin: irParaTelaDeLogin)),
+            ),
             icon: Icon(icone),
             color: Colors.black,
             iconSize: 30,

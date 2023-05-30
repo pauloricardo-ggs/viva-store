@@ -51,7 +51,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
           produtos = snapshot.data!;
           return ListView.separated(
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.all(10.0),
             itemCount: produtos.length,
             separatorBuilder: (context, index) => const SizedBox(height: 8.0),

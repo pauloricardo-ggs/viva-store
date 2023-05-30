@@ -12,4 +12,12 @@ class ProdutoRepository {
     if (map != null) return Produto.fromMap(map);
     return null;
   }
+
+  Stream<List<Produto>> obterEmOferta() {
+    return firebaseFirestore.collection(collection).where('porcentagemDesconto', isNotEqualTo: 0).snapshots().map((snapshot) => snapshot.docs.map((doc) => Produto.fromMap(doc.data())).toList());
+  }
+
+  Stream<List<Produto>> obterPorCategoria(String categoria) {
+    return firebaseFirestore.collection(collection).where('categoria', isEqualTo: categoria).snapshots().map((snapshot) => snapshot.docs.map((doc) => Produto.fromMap(doc.data())).toList());
+  }
 }
