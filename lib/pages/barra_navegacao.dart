@@ -19,22 +19,14 @@ class BarraNavegacao extends StatefulWidget {
 class _BarraNavegacaoState extends State<BarraNavegacao> {
   final _authController = Get.put(AuthController());
   final _devPack = const DevPack();
-  int _currentPage = 0;
+  Pages _currentPage = Pages.homePage;
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages = [
-      HomePage(
-        irParaTelaDeLogin: () => setState(() => _currentPage = 3),
-      ),
-      const FavoritesPage(),
-      const PurchasesPage(),
-      const AuthPage(),
-    ];
     return Scaffold(
       body: Stack(
         children: [
-          pages[_currentPage],
+          buildPage(_currentPage),
           Align(
             alignment: Alignment.bottomCenter,
             child: ClipRect(
@@ -45,7 +37,7 @@ class _BarraNavegacaoState extends State<BarraNavegacao> {
                   selectedItemColor: Colors.black,
                   unselectedItemColor: HSLColor.fromColor(Theme.of(context).colorScheme.primary).withSaturation(Get.isDarkMode ? 0.3 : 0.7).toColor(),
                   selectedFontSize: 12,
-                  currentIndex: _currentPage,
+                  currentIndex: _currentPage.index,
                   onTap: (value) {
                     if (!_authController.logado()) {
                       if (value == 1) {
@@ -57,7 +49,7 @@ class _BarraNavegacaoState extends State<BarraNavegacao> {
                         return;
                       }
                     }
-                    setState(() => _currentPage = value);
+                    setState(() => _currentPage = Pages.values[value]);
                   },
                   items: const [
                     BottomNavigationBarItem(
@@ -89,4 +81,31 @@ class _BarraNavegacaoState extends State<BarraNavegacao> {
       ),
     );
   }
+
+  void irParaTela(Pages page) {
+    setState(() => _currentPage = page);
+  }
+
+  Widget buildPage(Pages page) {
+    switch (page) {
+      case Pages.homePage:
+        return HomePage(irParaTelaDeLogin: () => setState(() => _currentPage = Pages.loginPage));
+      case Pages.favoritesPage:
+        return const FavoritesPage();
+      case Pages.purchasesPage:
+        return const PurchasesPage();
+      case Pages.authPage:
+        return const AuthPage();
+      default:
+        return const SizedBox();
+    }
+  }
+}
+
+enum Pages {
+  homePage,
+  favoritesPage,
+  purchasesPage,
+  authPage,
+  loginPage,
 }
