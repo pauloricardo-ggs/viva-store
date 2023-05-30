@@ -27,9 +27,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
     if (authController.logado()) {
       carrinhoController.obterCarrinho();
       favoritosController.obterFavoritos();
-    } else {
-      carrinhoController.itens.clear();
-      favoritosController.produtosId.clear();
     }
     super.initState();
   }

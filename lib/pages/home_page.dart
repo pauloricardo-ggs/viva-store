@@ -54,9 +54,6 @@ class _HomePageState extends State<HomePage> {
     if (authController.logado()) {
       carrinhoController.obterCarrinho();
       favoritosController.obterFavoritos();
-    } else {
-      carrinhoController.itens.clear();
-      favoritosController.produtosId.clear();
     }
     super.initState();
   }

@@ -25,4 +25,8 @@ class FavoritosController extends GetxController {
   bool estaNosFavoritos(String produtoId) {
     return _produtosId.contains(produtoId);
   }
+
+  void limpar() {
+    _produtosId.clear();
+  }
 }

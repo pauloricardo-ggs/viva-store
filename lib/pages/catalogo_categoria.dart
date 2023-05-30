@@ -41,9 +41,6 @@ class _CatalogoPageState extends State<CatalogoPage> {
     if (authController.logado()) {
       carrinhoController.obterCarrinho();
       favoritosController.obterFavoritos();
-    } else {
-      carrinhoController.itens.clear();
-      favoritosController.produtosId.clear();
     }
     super.initState();
   }

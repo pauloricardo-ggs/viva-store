@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:viva_store/pages/catalogo_categoria.dart';
 
-class BotaoCategoria extends StatelessWidget {
+class BotaoCategoria extends StatefulWidget {
   final Color cor;
   final IconData? icone;
   final String nome;
@@ -16,6 +16,11 @@ class BotaoCategoria extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<BotaoCategoria> createState() => _BotaoCategoriaState();
+}
+
+class _BotaoCategoriaState extends State<BotaoCategoria> {
+  @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -25,14 +30,14 @@ class BotaoCategoria extends StatelessWidget {
           height: 65,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(100),
-            color: cor,
+            color: widget.cor,
           ),
           child: IconButton(
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => CatalogoPage(categoria: nome, irParaTelaDeLogin: irParaTelaDeLogin)),
+              MaterialPageRoute(builder: (context) => CatalogoPage(categoria: widget.nome, irParaTelaDeLogin: widget.irParaTelaDeLogin)),
             ),
-            icon: Icon(icone),
+            icon: Icon(widget.icone),
             color: Colors.black,
             iconSize: 30,
           ),
@@ -41,7 +46,7 @@ class BotaoCategoria extends StatelessWidget {
         SizedBox(
           width: 65,
           child: Text(
-            nome,
+            widget.nome,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
           ),

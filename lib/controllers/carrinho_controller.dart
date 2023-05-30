@@ -79,4 +79,9 @@ class CarrinhoController extends GetxController {
     });
     return quantidade;
   }
+
+  void limpar() {
+    _itens.clear();
+    _produtos.clear();
+  }
 }
