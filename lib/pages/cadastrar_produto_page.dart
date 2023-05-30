@@ -758,6 +758,8 @@ class _CarrosselDeImagensState extends State<CarrosselDeImagens> {
       key: const Key('1'),
       borderRadius: BorderRadius.circular(15.0),
       child: Container(
+        height: 250,
+        width: 250,
         decoration: BoxDecoration(
           color: (isDark ? Colors.black : Colors.white).withOpacity(0.5),
         ),

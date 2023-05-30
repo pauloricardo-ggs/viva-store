@@ -150,7 +150,7 @@ class ProdutoCarrinhoCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const SizedBox(height: 15),
+        const SizedBox(height: 10),
         FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
